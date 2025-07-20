@@ -187,6 +187,11 @@ startup
     #endregion
 }
 
+onStart
+{
+    vars.hasSplit = new List<string>();
+}
+
 isLoading
 {
     return current.isLoading;
