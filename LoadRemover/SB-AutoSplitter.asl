@@ -16,17 +16,17 @@ state("SB-Win64-Shipping", "1.1.0")
     float posZ : 0x6F89608;
 }
 
-startup
-{
-    vars.hasSplit = new List<string>();
-}
-
 init
 {
     // 328835072 - current patch
     // 356278272 - ver 1.1.0
 	if (modules.First().ModuleMemorySize == 356278272)
 		version = "1.1.0";
+}
+
+onStart
+{
+    vars.hasSplit = new List<string>();
 }
 
 isLoading
