@@ -2,11 +2,17 @@ state("SB-Win64-Shipping", "current")
 {
     // patch 1.2.0
     bool isLoading : 0x7103D20;
+    float posX : 0x6F83B1C;
+    float posY : 0x703BFEC;
+    float posZ : 0x6F83B18;
 }
 
 state("SB-Win64-Shipping", "1.1.0")
 {
     bool isLoading : 0x6D83DEC;
+    float posX : 0x6DFAF54;
+    float posY : 0x6DFAF58;
+    float posZ : 0x6DFAF5C;
 }
 
 init
@@ -15,10 +21,6 @@ init
     // 356278272 - ver 1.1.0
 	if (modules.First().ModuleMemorySize == 356278272)
 		version = "1.1.0";
-
-    current.posX = 0f;
-    current.posY = 0f;
-    current.posZ = 0f;
 
     vars.triggerRadius = 10f;
 
@@ -74,10 +76,6 @@ isLoading
 
 update
 {
-    current.posX = new DeepPointer(0x6F83B1C).Deref<float>(game);
-    current.posY = new DeepPointer(0x703BFEC).Deref<float>(game);
-    current.posZ = new DeepPointer(0x6F83B18).Deref<float>(game);
-
     if (timer.CurrentPhase == TimerPhase.NotRunning) {
         vars.usedPositions.Clear();
     }
