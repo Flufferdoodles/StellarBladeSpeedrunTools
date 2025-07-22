@@ -14,8 +14,7 @@ state("SB-Win64-Shipping", "1.1.0")
     float posX : 0x6DFAF54;
     float posY : 0x6DFAF58;
     float posZ : 0x6DFAF5C;
-    // TODO find this address for 1.1.0
-    int titleScreen : 0x710B4E4;
+    int titleScreen : 0x7105438;
 }
 
 init
