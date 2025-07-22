@@ -5,6 +5,7 @@ state("SB-Win64-Shipping", "current")
     float posX : 0x6F83B1C;
     float posY : 0x703BFEC;
     float posZ : 0x6F83B18;
+    int titleScreen : 0x710B4E4;
 }
 
 state("SB-Win64-Shipping", "1.1.0")
@@ -13,6 +14,8 @@ state("SB-Win64-Shipping", "1.1.0")
     float posX : 0x6DFAF54;
     float posY : 0x6DFAF58;
     float posZ : 0x6DFAF5C;
+    // TODO find this address for 1.1.0
+    int titleScreen : 0x710B4E4;
 }
 
 init
@@ -99,4 +102,17 @@ split
         vars.usedPositions.Add(splitPos.Key);
         return true;
     }
+}
+
+start
+{
+    if (
+        (current.titleScreen == 48 || current.titleScreen == 54)
+        && (old.titleScreen + 1) == current.titleScreen
+    ) {
+        // 47 to 48 -- press continue
+        // 53 to 54 -- new game or new game plus
+        return true;
+    }
+
 }
