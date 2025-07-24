@@ -191,7 +191,7 @@ startup
 
 onStart
 {
-    vars.hasSplit = new List<string>();
+    vars.usedPositions.Clear();
 }
 
 isLoading
@@ -199,20 +199,10 @@ isLoading
     return current.isLoading;
 }
 
-update
-{
-    // Reset list when reseting a run
-    if (timer.CurrentPhase == TimerPhase.NotRunning) {
-        vars.usedPositions.Clear();
-    }
-}
-
 split
 {
     // Last Split
     if (old.titleScreen == 332 && current.titleScreen == 58) {
-        // TODO this is a split for the end of the game
-        // test code to track if it triggers too early
         return true;
     }
 
