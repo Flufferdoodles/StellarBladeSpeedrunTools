@@ -5,6 +5,7 @@ state("SB-Win64-Shipping", "current")
     float posX : 0x6F83B1C;
     float posY : 0x703BFEC;
     float posZ : 0x6F83B18;
+    int event_id  : 0x710B4E4;
 }
 
 state("SB-Win64-Shipping", "1.1.0")
@@ -13,6 +14,7 @@ state("SB-Win64-Shipping", "1.1.0")
     float posX : 0x6DFAF54;
     float posY : 0x6DFAF58;
     float posZ : 0x6DFAF5C;
+    int event_id  : 0x7105438;
 }
 
 init
@@ -207,6 +209,13 @@ update
 
 split
 {
+    // Last Split
+    if (old.titleScreen == 332 && current.titleScreen == 58) {
+        // TODO this is a split for the end of the game
+        // test code to track if it triggers too early
+        return true;
+    }
+
     // Position Spliting
     foreach(var splitPos in vars.positionRegistery) {
         if (settings[splitPos.Key] == false) continue;
@@ -218,4 +227,17 @@ split
         vars.usedPositions.Add(splitPos.Key);
         return true;
     }
+}
+
+start
+{
+    if (
+        (current.event_id == 54)
+        && (old.event_id + 1) == current.event_id
+    ) {
+        // 47 to 48 -- press continue
+        // 53 to 54 -- new game or new game plus
+        return true;
+    }
+
 }
