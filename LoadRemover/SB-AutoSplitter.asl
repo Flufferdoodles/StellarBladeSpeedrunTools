@@ -239,5 +239,4 @@ start
         // 53 to 54 -- new game or new game plus
         return true;
     }
-
 }
