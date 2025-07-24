@@ -202,7 +202,7 @@ isLoading
 split
 {
     // Last Split
-    if (old.titleScreen == 332 && current.titleScreen == 58) {
+    if (old.event_id == 332 && current.event_id == 58) {
         return true;
     }
 
