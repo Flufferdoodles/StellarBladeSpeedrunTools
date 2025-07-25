@@ -27,6 +27,7 @@ init
     vars.triggerRadius = 10f;
 
     #region Position Splits
+    vars.positionRegistery = new Dictionary<string,List<float>>();
     vars.positionRegistery.Add("Prologue",new List<float>() {-26261,4402,-17109});
     vars.positionRegistery.Add("Activate Camp : Silent Street",new List<float>() {-69788,14117,46521});
     vars.positionRegistery.Add("Enter Area : Parking Tower 2nd Floor",new List<float>() {-47629,14485,35382});
@@ -202,7 +203,10 @@ isLoading
 split
 {
     // Last Split
-    if (old.event_id == 332 && current.event_id == 58) {
+    if (
+        old.event_id == 332 && current.event_id == 58
+        && settings["Credits Roll"]
+    ) {
         return true;
     }
 
@@ -222,11 +226,13 @@ split
 start
 {
     if (
-        (current.event_id == 54)
+        (current.event_id == 54 || current.event_id == 50)
         && (old.event_id + 1) == current.event_id
     ) {
         // 47 to 48 -- press continue
         // 53 to 54 -- new game or new game plus
+        // 49 to 50 -- ng or ng+ on some systems, unsure what the difference is
         return true;
     }
+
 }
