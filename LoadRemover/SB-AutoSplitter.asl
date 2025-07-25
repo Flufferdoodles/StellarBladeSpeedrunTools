@@ -27,11 +27,12 @@ isLoading
 start
 {
     if (
-        (current.titleScreen == 48 || current.titleScreen == 54)
-        && (old.titleScreen + 1) == current.titleScreen
+        (current.event_id == 54 || current.event_id == 50)
+        && (old.event_id + 1) == current.event_id
     ) {
         // 47 to 48 -- press continue
         // 53 to 54 -- new game or new game plus
+        // 49 to 50 -- ng or ng+ on some systems, unsure what the difference is
         return true;
     }
 }
