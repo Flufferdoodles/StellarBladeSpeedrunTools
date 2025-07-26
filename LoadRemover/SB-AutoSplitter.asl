@@ -144,7 +144,7 @@ onStart
     vars.AddPositionToRegistery("Enter Area : Construction Zone Panoramic View",-20640,21738,9857);
     vars.AddPositionToRegistery("Enter Area : Crater",-31267,16947,-6153);
     vars.AddPositionToRegistery("Enter Area : Xion",18273,80,-13125);
-    vars.AddPositionToRegistery("Enter Area : Wastelands",-18175,3146,14879);
+    vars.AddPositionToRegistery("Enter Area : Wastelands",-18157,3146,14879);
     vars.AddPositionToRegistery("Activate Elevator : Altess Levoire Entrance",34968,-5945,-32377);
     vars.AddPositionToRegistery("Enter Area : Altess Levoire",936,-8518,25037);
     vars.AddPositionToRegistery("Enter Area : Capsule Cluster Room",886,-9458,5178);
@@ -162,7 +162,7 @@ onStart
     vars.AddPositionToRegistery("Enter Area : Rotten Labyrinth",-77697,1763,48990);
     vars.AddPositionToRegistery("Activate Camp : Temporary Armoury Entrance",-84397,-4481,79083);
     vars.AddPositionToRegistery("Begin Fight : Juggernaut",-85097,-4516,76149);
-    vars.AddPositionToRegistery("End Escape Sequence : Train Graveyard",-106871,-26344,10494);
+    vars.AddPositionToRegistery("End Escape Sequence : Train Graveyard",-106871,-26344,104694);
     vars.AddPositionToRegistery("Activate Camp : Contaminated Water Purification Plant Entrance",-109520,-23900,114033);
     vars.AddPositionToRegistery("Begin Fight : Tachy",-105915,-23287,122190);
     vars.AddPositionToRegistery("End Fight : Tachy",-106235,-29300,123264);
@@ -171,7 +171,7 @@ onStart
     vars.AddPositionToRegistery("Activate Door : Underground Passage",-12307,-8928,-1814);
     vars.AddPositionToRegistery("Activate Button : Turning off Lasers",-20868,-9608,-4369);
     vars.AddPositionToRegistery("Begin Fight : Maelstrom Abyss Levoire",-26510,-9590,12143);
-    vars.AddPositionToRegistery("End Fight : Maelstrom Abyss Levoire",17808,1732,-24140);
+    vars.AddPositionToRegistery("End Fight : Maelstrom Abyss Levoire",-25477,-9575,14144);
     vars.AddPositionToRegistery("Enter Area : Orca Space Complex",-25467,4861,13683);
     vars.AddPositionToRegistery("Activate Camp : Hypertube Entrance",-511,1354,12405);
     vars.AddPositionToRegistery("Activate 1st Generator",4652,-68,10229);
@@ -198,7 +198,7 @@ onStart
     vars.AddPositionToRegistery("Enter Area : Outside Nest",-14770,-2695,-42149);
     vars.AddPositionToRegistery("Begin Fight : Raven",-38064,-2474,-51333);
     vars.AddPositionToRegistery("Enter Area : Nest",75431,-563,-39156);
-    vars.AddPositionToRegistery("Begin Fight : Final Boss",43553,-2558,-39068);
+    vars.AddPositionToRegistery("Begin Fight : Final Boss",43553,-2537,-39068);
     #endregion
 }
 
@@ -210,7 +210,7 @@ isLoading
 
 update
 {
-    // print("id " + current.event_id);
+    print("id " + current.event_id);
 }
 
 split
@@ -224,8 +224,13 @@ split
     }
     // Position Spliting
     foreach(var splitPos in vars.positionRegistery) {
+        //if (splitPos.Key == "End Fight : Maelstrom Alstess Levoire") {
+        //    print("x : " + (current.posX < splitPos.Value[0] -vars.triggerRadius || current.posX > splitPos.Value[0] +vars.triggerRadius));
+        //    //print("y : " + (current.posY < splitPos.Value[1] -vars.triggerRadius || current.posY > splitPos.Value[1] +vars.triggerRadius));
+        //    print("z : " + (current.posZ < splitPos.Value[2] -vars.triggerRadius || current.posZ > splitPos.Value[2] +vars.triggerRadius));
+        //}
         if (current.posX < splitPos.Value[0] -vars.triggerRadius || current.posX > splitPos.Value[0] +vars.triggerRadius) continue;
-        if (current.posY < splitPos.Value[1] -vars.triggerRadius || current.posY > splitPos.Value[1] +vars.triggerRadius) continue;
+        // if (current.posY < splitPos.Value[1] -vars.triggerRadius || current.posY > splitPos.Value[1] +vars.triggerRadius) continue;
         if (current.posZ < splitPos.Value[2] -vars.triggerRadius || current.posZ > splitPos.Value[2] +vars.triggerRadius) continue;
 
         vars.positionRegistery.Remove(splitPos.Key);
@@ -236,7 +241,7 @@ split
 start
 {
     if (
-        (current.event_id == 50)
+        (current.event_id == 50 || current.event_id == 54)
         && (old.event_id + 1) == current.event_id
     ) {
         // 47 to 48 -- press continue
