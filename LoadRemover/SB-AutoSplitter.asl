@@ -207,19 +207,14 @@ isLoading
     return current.isLoading;
 }
 
-
-update
-{
-    print("id " + current.event_id);
-}
-
 split
 {
     
     // Last Split
-    if (old.event_id == 332 && current.event_id == 58) {
-        // TODO this is a split for the end of the game
-        // test code to track if it triggers too early
+    if (
+        old.event_id == 332 && current.event_id == 58
+        && settings["Credits Roll"]
+    ) {
         return true;
     }
     // Position Spliting
@@ -241,11 +236,13 @@ split
 start
 {
     if (
-        (current.event_id == 50 || current.event_id == 54)
+        (current.event_id == 54 || current.event_id == 50)
         && (old.event_id + 1) == current.event_id
     ) {
         // 47 to 48 -- press continue
         // 53 to 54 -- new game or new game plus
+        // 49 to 50 -- ng or ng+ on some systems, unsure what the difference is
         return true;
     }
+
 }
