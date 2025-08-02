@@ -17,6 +17,11 @@ state("SB-Win64-Shipping", "1.1.0")
     int event_id  : 0x7105438;
 }
 
+update {
+    // print("value : " + (current.event_id));
+    // print("x " + current.posX + "  y " + current.posY + "  z " + current.posZ);
+}
+
 init
 {
     // 328835072 - current patch
@@ -54,6 +59,7 @@ startup
     settings.Add("Begin Fight : Corrupter", false,"Begin Fight : Corrupter","Eidos 7");
     settings.Add("Enter Area : Construction Zone", false,"Enter Area : Construction Zone","Eidos 7");
     settings.Add("Enter Area : Construction Zone Panoramic View", false,"Enter Area : Construction Zone Panoramic View","Eidos 7");
+    settings.Add("Activate Button : Sewer", false,"Activate Button : Sewer","Eidos 7");
     settings.Add("Enter Area : Crater", false,"Enter Area : Crater","Eidos 7");
 
     settings.Add("Wasteland");
@@ -142,6 +148,7 @@ onStart
     vars.AddPositionToRegistery("Begin Fight : Corrupter",-11488,19310,12357);
     vars.AddPositionToRegistery("Enter Area : Construction Zone",-8150,20585,11805);
     vars.AddPositionToRegistery("Enter Area : Construction Zone Panoramic View",-20640,21738,9857);
+    vars.AddPositionToRegistery("Activate Button : Sewer",-21783,19131,-285);
     vars.AddPositionToRegistery("Enter Area : Crater",-31267,16947,-6153);
     vars.AddPositionToRegistery("Enter Area : Xion",18273,80,-13125);
     vars.AddPositionToRegistery("Enter Area : Wastelands",-18157,3146,14879);
@@ -209,21 +216,21 @@ isLoading
 
 split
 {
-    
-    // Last Split
+    // Last Split -- Currently not Working
+    /*
     if (
         old.event_id == 332 && current.event_id == 58
         && settings["Credits Roll"]
     ) {
         return true;
     }
+
+    if (current.event_id < 100 && current.event_id > 50 && vars.positionRegistery.Count == 0 && settings["Credits Roll"])
+        return true;
+    */
+
     // Position Spliting
     foreach(var splitPos in vars.positionRegistery) {
-        //if (splitPos.Key == "End Fight : Maelstrom Alstess Levoire") {
-        //    print("x : " + (current.posX < splitPos.Value[0] -vars.triggerRadius || current.posX > splitPos.Value[0] +vars.triggerRadius));
-        //    //print("y : " + (current.posY < splitPos.Value[1] -vars.triggerRadius || current.posY > splitPos.Value[1] +vars.triggerRadius));
-        //    print("z : " + (current.posZ < splitPos.Value[2] -vars.triggerRadius || current.posZ > splitPos.Value[2] +vars.triggerRadius));
-        //}
         if (current.posX < splitPos.Value[0] -vars.triggerRadius || current.posX > splitPos.Value[0] +vars.triggerRadius) continue;
         // if (current.posY < splitPos.Value[1] -vars.triggerRadius || current.posY > splitPos.Value[1] +vars.triggerRadius) continue;
         if (current.posZ < splitPos.Value[2] -vars.triggerRadius || current.posZ > splitPos.Value[2] +vars.triggerRadius) continue;
