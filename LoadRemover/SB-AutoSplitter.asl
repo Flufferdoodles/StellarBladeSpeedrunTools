@@ -1,5 +1,12 @@
 state("SB-Win64-Shipping", "current")
 {
+    // patch 1.3.0
+    bool isLoading : 0x71049C8;
+    int titleScreen : 0x710B8B8;
+}
+
+state("SB-Win64-Shipping", "1.2.0")
+{
     // patch 1.2.0
     bool isLoading : 0x7103D20;
     int titleScreen : 0x710B4E4;
@@ -13,7 +20,9 @@ state("SB-Win64-Shipping", "1.1.0")
 
 init
 {
-    // 328835072 - current patch
+    // 328835072 - ver 1.2.0
+    if (modules.First().ModuleMemorySize == 328835072)
+        version = "1.2.0";
     // 356278272 - ver 1.1.0
 	if (modules.First().ModuleMemorySize == 356278272)
 		version = "1.1.0";
@@ -27,7 +36,7 @@ isLoading
 start
 {
     if (
-        (current.event_id == 54 || current.event_id == 50)
+        (current.event_id == 54 || current.event_id == 50 || current.event_id == 53)
         && (old.event_id + 1) == current.event_id
     ) {
         // 47 to 48 -- press continue
