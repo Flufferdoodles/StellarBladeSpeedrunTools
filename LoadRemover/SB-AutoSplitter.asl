@@ -14,7 +14,7 @@ state("SB-Win64-Shipping", "1.2.0")
 
 state("SB-Win64-Shipping", "1.1.0")
 {
-    bool isLoading : 0x6D83DEC;
+    bool isLoading : 0x70FD960;
     int event_id : 0x7105438;
 }
 
