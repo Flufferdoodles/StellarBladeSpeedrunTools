@@ -18,7 +18,7 @@ state("SB-Win64-Shipping", "1.2.0")
 
 state("SB-Win64-Shipping", "1.1.0")
 {
-    bool isLoading : 0x6D83DEC;
+    bool isLoading : 0x70FD960;
     float posX : 0x6DFAF54;
     float posY : 0x6DFAF58;
     float posZ : 0x6DFAF5C;
@@ -28,8 +28,6 @@ state("SB-Win64-Shipping", "1.1.0")
 update {
     // print("value : " + (current.event_id));
     // print("x " + current.posX + "  y " + current.posY + "  z " + current.posZ);
-    bool isLoading : 0x70FD960;
-    int event_id : 0x7105438;
 }
 
 init
@@ -226,6 +224,32 @@ isLoading
     return current.isLoading;
 }
 
+split
+{
+    // Last Split -- Currently not Working
+    /*
+    if (
+        old.event_id == 332 && current.event_id == 58
+        && settings["Credits Roll"]
+    ) {
+        return true;
+    }
+
+    if (current.event_id < 100 && current.event_id > 50 && vars.positionRegistery.Count == 0 && settings["Credits Roll"])
+        return true;
+    */
+
+    // Position Spliting
+    foreach(var splitPos in vars.positionRegistery) {
+        if (current.posX < splitPos.Value[0] -vars.triggerRadius || current.posX > splitPos.Value[0] +vars.triggerRadius) continue;
+        // if (current.posY < splitPos.Value[1] -vars.triggerRadius || current.posY > splitPos.Value[1] +vars.triggerRadius) continue;
+        if (current.posZ < splitPos.Value[2] -vars.triggerRadius || current.posZ > splitPos.Value[2] +vars.triggerRadius) continue;
+
+        vars.positionRegistery.Remove(splitPos.Key);
+        return true;
+    }
+}
+
 start
 {
     if (
@@ -237,4 +261,5 @@ start
         // 49 to 50 -- ng or ng+ on some systems, unsure what the difference is
         return true;
     }
+
 }
