@@ -1,7 +1,15 @@
 state("SB-Win64-Shipping", "current")
 {
+    // patch 1.3.0
+    bool isLoading : 0x71049C8;
+    int event_id : 0x710B8B8;
+}
+
+state("SB-Win64-Shipping", "1.2.0")
+{
     // patch 1.2.0
     bool isLoading : 0x7103D20;
+    int event_id : 0x710B4E4;
     float posX : 0x6F83B1C;
     float posY : 0x703BFEC;
     float posZ : 0x6F83B18;
@@ -20,11 +28,15 @@ state("SB-Win64-Shipping", "1.1.0")
 update {
     // print("value : " + (current.event_id));
     // print("x " + current.posX + "  y " + current.posY + "  z " + current.posZ);
+    bool isLoading : 0x70FD960;
+    int event_id : 0x7105438;
 }
 
 init
 {
-    // 328835072 - current patch
+    // 328835072 - ver 1.2.0
+    if (modules.First().ModuleMemorySize == 328835072)
+        version = "1.2.0";
     // 356278272 - ver 1.1.0
 	if (modules.First().ModuleMemorySize == 356278272)
 		version = "1.1.0";
@@ -214,36 +226,10 @@ isLoading
     return current.isLoading;
 }
 
-split
-{
-    // Last Split -- Currently not Working
-    /*
-    if (
-        old.event_id == 332 && current.event_id == 58
-        && settings["Credits Roll"]
-    ) {
-        return true;
-    }
-
-    if (current.event_id < 100 && current.event_id > 50 && vars.positionRegistery.Count == 0 && settings["Credits Roll"])
-        return true;
-    */
-
-    // Position Spliting
-    foreach(var splitPos in vars.positionRegistery) {
-        if (current.posX < splitPos.Value[0] -vars.triggerRadius || current.posX > splitPos.Value[0] +vars.triggerRadius) continue;
-        // if (current.posY < splitPos.Value[1] -vars.triggerRadius || current.posY > splitPos.Value[1] +vars.triggerRadius) continue;
-        if (current.posZ < splitPos.Value[2] -vars.triggerRadius || current.posZ > splitPos.Value[2] +vars.triggerRadius) continue;
-
-        vars.positionRegistery.Remove(splitPos.Key);
-        return true;
-    }
-}
-
 start
 {
     if (
-        (current.event_id == 54 || current.event_id == 50)
+        (current.event_id == 54 || current.event_id == 50 || current.event_id == 53)
         && (old.event_id + 1) == current.event_id
     ) {
         // 47 to 48 -- press continue
@@ -251,5 +237,4 @@ start
         // 49 to 50 -- ng or ng+ on some systems, unsure what the difference is
         return true;
     }
-
 }
