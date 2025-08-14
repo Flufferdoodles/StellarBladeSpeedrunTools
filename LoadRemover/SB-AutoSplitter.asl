@@ -1,5 +1,12 @@
 state("SB-Win64-Shipping", "current")
 {
+    // patch 1.3.1
+    bool isLoading : 0x71099A8;
+    int event_id : 0x7110898;
+}
+
+state("SB-Win64-Shipping", "1.3.0")
+{
     // patch 1.3.0
     bool isLoading : 0x71049C8;
     int event_id : 0x710B8B8;
@@ -253,7 +260,7 @@ split
 start
 {
     if (
-        (current.event_id == 54 || current.event_id == 50 || current.event_id == 53)
+        (current.event_id == 54 || current.event_id == 50 || current.event_id == 53 || current.event_id == 47)
         && (old.event_id + 1) == current.event_id
     ) {
         // 47 to 48 -- press continue
