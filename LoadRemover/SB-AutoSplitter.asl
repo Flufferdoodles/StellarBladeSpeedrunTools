@@ -1,5 +1,12 @@
 state("SB-Win64-Shipping", "current")
 {
+    // patch 1.4.1
+    bool isLoading : 0x70BE018;
+    int event_id : 0x70C5BC4;
+}
+
+state("SB-Win64-Shipping", "1.4.0")
+{
     // patch 1.4.0
     bool isLoading : 0x70BD3D0;
     int event_id : 0x70C4B68;
