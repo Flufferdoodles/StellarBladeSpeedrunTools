@@ -109,7 +109,6 @@ startup
         new object[] { "Air Vent Start", "/Subtitle/AltesLabor/ATL03/Theater/Subtitle_ATL03_HeatoutletStart_01.Subtitle_ATL03_HeatoutletStart_01", "Altess Levoire" },
         new object[] { "Boss Start Cutscene", "/Theater/AltesLabor/ATL03/Theater/MV_ATL03_OuterwallMove.MV_ATL03_OuterwallMove", "Altess Levoire" },
         new object[] { "Boss Killed", "/Subtitle/AltesLabor/ATL03/Theater/Subtitle_ATL03_GainHypercell_Drone.Subtitle_ATL03_GainHypercell_Drone", "Altess Levoire" },
-        new object[] { "Legacy 3 Cutscene", "/Theater/AbyssLabor/AYL03/Theater/MV_AYL03_Legacy3_Hologram_Theater.MV_AYL03_Legacy3_Hologram_Theater", "Altess Levoire" },
 
         // Matrix XI
         new object[] { "Collapsed Rail Bridge Start", "/Theater/Matrix/MatrixXI/ME02/Theaters/ME_Area02_EP_12.ME_Area02_EP_12", "Matrix XI" },
@@ -119,7 +118,56 @@ startup
         new object[] { "Juggernaut Finisher", "meDesign/Level/Theater/Matrix/MatrixXI/ME05/Theaters/MV_ME05_EliteNative_Finish_Theater.MV_ME05_EliteNative_Finish_Theater'", "Matrix XI" },
         new object[] { "Left Train Graveyard", "/Theater/Matrix/MatrixXI/ME05/Theaters/EP/Temp_ME05_EP_Barrack05B_Theater.Temp_ME05_EP_Barrack05B_Theater", "Matrix XI" },
         new object[] { "Tachy Start Cutscene", "/Theater/Matrix/MatrixXI/ME06/Theaters/MV_ME06_Tachy_Entrance_Theater.MV_ME06_Tachy_Entrance_Theater", "Matrix XI" },
-        new object[] { "Tachy Finisher", "meDesign/Level/Theater/Matrix/MatrixXI/ME06/Theaters/MV_ME06_Tachy_Die_Theater.MV_ME06_Tachy_Die_Theater'", "Matrix XI" }
+        new object[] { "Tachy Finisher", "meDesign/Level/Theater/Matrix/MatrixXI/ME06/Theaters/MV_ME06_Tachy_Die_Theater.MV_ME06_Tachy_Die_Theater'", "Matrix XI" },
+
+        // Xion #2
+        new object[] { "Xion #2 Tetrapod Landing", "/Theater/Xion/Xion01/Theater/MV_Xion01_PODAfterATLLanding_Theater.MV_Xion01_PODAfterATLLanding_Theater", "Xion #2" },
+
+        // Matrix XI to Wasteland/Abyss Levoire
+        new object[] { "Tetrapod Landing", "/Theater/WasteLandB/WLB20/Theater/MV_WLB20_POD_WLB_To_Matrix.MV_WLB20_POD_WLB_To_Matrix", "Abyss Levoire" },
+
+        // Abyss Levoire
+        new object[] { "Capsule Cluster Room Entered", "/Subtitle/AbyssLabor/AYL03/Theater/Subtitle_AYL03_ClusterRoom_Enter.Subtitle_AYL03_ClusterRoom_Enter", "Abyss Levoire" },
+        new object[] { "Laser Room Entered", "/Subtitle/AbyssLabor/AYL04/Theater/Subtitle_AYL04_LaserEscape_01.Subtitle_AYL04_LaserEscape_01", "Abyss Levoire" },
+        new object[] { "Laser Room End", "/Subtitle/AbyssLabor/AYL04/Theater/Subtitle_AYL04_LaserEscape_05.Subtitle_AYL04_LaserEscape_05", "Abyss Levoire" },
+        new object[] { "Maelstrom Fight Start", "/Theater/AbyssLabor/AYL06/Theater/MV_AYL06_Maelstrom.MV_AYL06_Maelstrom", "Abyss Levoire" },
+        new object[] { "Legacy 3 Cutscene", "/Theater/AbyssLabor/AYL03/Theater/MV_AYL03_Legacy3_Hologram_Theater.MV_AYL03_Legacy3_Hologram_Theater", "Abyss Levoire" },
+
+        // Xion #4
+        new object[] { "Landing Cutscene", "/Theater/Xion/Xion01/Theater/MV_Xion01_PODAfterAYLLanding_Theater.MV_Xion01_PODAfterAYLLanding_Theater", "Xion #4" },
+
+        // Spire 4
+        new object[] { "Intro Cutscene", "/Theater/SpaceElevator/SE01/Theater/MV_SE01_Intro.MV_SE01_Intro", "Spire 4" },
+        new object[] { "Hypertube Opened", "/Theater/SpaceElevator/SE02/Theater/MV_SE02_ContainerControlTransit.MV_SE02_ContainerControlTransit", "Spire 4" },
+        new object[] { "Belial #1 Start Cutscene", "/Theater/SpaceElevator/SE04/Theater/MV_SE04_Chasing_Theater.MV_SE04_Chasing_Theater", "Spire 4" },
+        new object[] { "Belial #1 End Cutscene", "meDesign/Level/Theater/SpaceElevator/SE04/Theater/MV_SE04_WeaponMaster_RunAway.MV_SE04_WeaponMaster_RunAway'", "Spire 4" },
+        new object[] { "Raphael Space Center Discovery", "/Theater/SpaceElevator/SE06/Theater/MV_SE06_LobbyEntrance_Theater.MV_SE06_LobbyEntrance_Theater", "Spire 4" },
+        new object[] { "Belial Fight Start", "/Theater/SpaceElevator/SE06/Theater/MV_SE06_LobbyEliteSpawn_Theater.MV_SE06_LobbyEliteSpawn_Theater", "Spire 4" },
+        new object[] { "Belial Finisher", "/Theater/SpaceElevator/SE06/Theater/MV_SE06_LobbyEliteFinish_Theater.MV_SE06_LobbyEliteFinish_Theater", "Spire 4" },
+        new object[] { "Maintenance Sector Entered", "/Theater/SpaceElevator/SE07/Theater/MV_SE07_01_CargoElevatorTeleport_Start.MV_SE07_01_CargoElevatorTeleport_Start", "Spire 4" },
+        new object[] { "Entering Passenger Lift 161", "/Theater/SpaceElevator/SE07/Theater/MV_SE07_02_PassengerElevatorTeleport_Start.MV_SE07_02_PassengerElevatorTeleport_Start", "Spire 4" },
+        new object[] { "Vermillion Garden Karakuri Started", "/Theater/SpaceElevator/SE08/Theater/SE08_01_EliteNative_Entrance.SE08_01_EliteNative_Entrance", "Spire 4" },
+        new object[] { "Karakuri Finisher QTE", "/Theater/SpaceElevator/SE08/Theater/MV_SE08_01_EliteNative_QTE_Master.MV_SE08_01_EliteNative_QTE_Master", "Spire 4" },
+        new object[] { "Central Core Room Entered", "/Theater/SpaceElevator/SE10/Theater/MV_SE10_AlphaNative_Entrance_Master.MV_SE10_AlphaNative_Entrance_Master", "Spire 4" },
+        new object[] { "Democrawler Finisher", "/Theater/SpaceElevator/SE10/Theater/MV_SE10_AlphaNative_Ending_Master.MV_SE10_AlphaNative_Ending_Master", "Spire 4" },
+
+        // Wasteland/Abyss Levoire
+        new object[] { "Crashlanding Cutscene", "/Theater/WasteLandB/WLB10/Theater/Dialogue_WLB10_FirstEnter.Dialogue_WLB10_FirstEnter", "Wasteland/Abyss Levoire" },
+        new object[] { "Shael Fight Start", "/Theater/WasteLandB/WLB30/Theater/Dialogue_WLB10_NearAbyssLabor_BeforeBattle.Dialogue_WLB10_NearAbyssLabor_BeforeBattle", "Wasteland/Abyss Levoire" },
+        new object[] { "Shael Fight End", "/Theater/WasteLandB/WLB10/Theater/MV_WLB10_RoyalGuard_AfterBattle.MV_WLB10_RoyalGuard_AfterBattle", "Wasteland/Abyss Levoire" },
+
+        // Wasteland Endgame
+        new object[] { "Approaching Wasteland to Start Boss Rush", "/Theater/WasteLandA/WLA10/Theater/Dialogue_WLA10_POD_Landing_Theater.Dialogue_WLA10_POD_Landing_Theater", "Wasteland Endgame" },
+        new object[] { "Raven Fight Start", "/Theater/WasteLandA/WLA10/Theater/Dialogue_Nest_Intro.Dialogue_Nest_Intro", "Wasteland Endgame" },
+        new object[] { "Raven Finisher", "/Theater/WasteLandA/WLA10/Theater/MV_WLA_Nest_RavenBattle_QTE_Master.MV_WLA_Nest_RavenBattle_QTE_Master", "Wasteland Endgame" },
+
+        // Nest
+        new object[] { "Adam Cutscene", "/Theater/Nest/Nest20/Theater/MV_Nest_EncounterAdam.MV_Nest_EncounterAdam", "Nest" },
+        new object[] { "Lily Exosuit Finisher", "/Theater/Nest/Nest20/Theater/MV_Nest_FinalBattle_Lily_QTE_Die.MV_Nest_FinalBattle_Lily_QTE_Die", "Nest" },
+        new object[] { "End Credits", "/Theater/Nest/Nest40/Theater/MV_Nest_LilyEnding_Credits_Die.MV_Nest_LilyEnding_Credits_Die", "Nest" },
+        new object[] { "Adam Transitions Into Elder Naytiba", "/Theater/Nest/Nest20/Theater/MV_Nest_BattleAdam_Phase2.MV_Nest_BattleAdam_Phase2", "Nest" },
+        new object[] { "Elder Naytiba Finisher", "/Theater/Nest/Nest30/Theater/MV_Nest_FinalBattle_Adam_QTE.MV_Nest_FinalBattle_Adam_QTE", "Nest" },
+        new object[] { "In Orbit Heading Towards the Colony", "/Theater/Nest/Nest40/Theater/MV_Nest_BattleAdam_After_03.MV_Nest_BattleAdam_After_03", "Nest" }
     };
 
     var lastSection = "";
@@ -156,16 +204,6 @@ isLoading
 
 split
 {
-
-    // Position Spliting
-    // foreach(var splitPos in vars.positionRegistery) {
-    //     if (current.posX < splitPos.Value[0] -vars.triggerRadius || current.posX > splitPos.Value[0] +vars.triggerRadius) continue;
-    //     // if (current.posY < splitPos.Value[1] -vars.triggerRadius || current.posY > splitPos.Value[1] +vars.triggerRadius) continue;
-    //     if (current.posZ < splitPos.Value[2] -vars.triggerRadius || current.posZ > splitPos.Value[2] +vars.triggerRadius) continue;
-
-    //     vars.positionRegistery.Remove(splitPos.Key);
-    //     return true;
-    // }
 
     foreach (var entry in vars.eventRegistry) {
         // entry.Value.Item1 is the event string
