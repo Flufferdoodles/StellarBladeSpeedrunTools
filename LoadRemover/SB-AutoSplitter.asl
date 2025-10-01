@@ -191,7 +191,9 @@ onStart
     vars.eventRegistry.Clear();
     foreach (var evt in vars.Events) {
     // evt[0] = name, evt[1] = event string, evt[2] = section
-        vars.AddEventToRegistry(evt[0], evt[1], evt[2]);
+        if (settings[evt[0]] == true) {
+            vars.AddEventToRegistry(evt[0], evt[1], evt[2]);
+        }
     }
 
     #endregion
