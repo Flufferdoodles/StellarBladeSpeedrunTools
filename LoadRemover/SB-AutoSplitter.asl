@@ -171,7 +171,7 @@ startup
         // Nest
         new object[] { "Adam Cutscene", "/Theater/Nest/Nest20/Theater/MV_Nest_EncounterAdam.MV_Nest_EncounterAdam", "Nest" },
         new object[] { "Providence Finisher", "/Theater/Nest/Nest20/Theater/MV_Nest_FinalBattle_Lily_QTE_Die.MV_Nest_FinalBattle_Lily_QTE_Die", "Nest" },
-        new object[] { "End Credits", "/Theater/Nest/Nest40/Theater/MV_Nest_LilyEnding_Credits_Die.MV_Nest_LilyEnding_Credits_Die", "Nest" },
+        // new object[] { "End Credits", "/Theater/Nest/Nest40/Theater/MV_Nest_LilyEnding_Credits_Die.MV_Nest_LilyEnding_Credits_Die", "Nest" },
         new object[] { "Adam Transitions Into Elder Naytiba", "/Theater/Nest/Nest20/Theater/MV_Nest_BattleAdam_Phase2.MV_Nest_BattleAdam_Phase2", "Nest" },
         new object[] { "Elder Naytiba Finisher", "/Theater/Nest/Nest30/Theater/MV_Nest_FinalBattle_Adam_QTE.MV_Nest_FinalBattle_Adam_QTE", "Nest" },
         new object[] { "Return to the Colony", "/Theater/Nest/Nest40/Theater/MV_Nest_BattleAdam_After_03.MV_Nest_BattleAdam_After_03", "Nest" }
