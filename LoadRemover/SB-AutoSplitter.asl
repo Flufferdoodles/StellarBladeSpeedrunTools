@@ -213,14 +213,15 @@ isLoading
 
 split
 {
-
-    foreach (var entry in vars.eventRegistry) {
-        // entry.Value.Item1 is the event string
-        if (current.Event == entry.Value.Item1) {
-            vars.eventRegistry.Remove(entry.Key);
-            return true;
-        }
-    }
+	if (current.Event != old.Event) {
+		foreach (var entry in vars.eventRegistry) {
+			// entry.Value.Item1 is the event string
+			if (current.Event == entry.Value.Item1) {
+				vars.eventRegistry.Remove(entry.Key);
+				return true;
+			}
+		}
+	}
 }
 
 start
