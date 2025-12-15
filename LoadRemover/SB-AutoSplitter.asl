@@ -148,7 +148,7 @@ startup
         new object[] { "Hypertube Opened", "/Theater/SpaceElevator/SE02/Theater/MV_SE02_ContainerControlTransit.MV_SE02_ContainerControlTransit", "Spire 4" },
         new object[] { "Belial #1 Start Cutscene", "/Theater/SpaceElevator/SE04/Theater/MV_SE04_Chasing_Theater.MV_SE04_Chasing_Theater", "Spire 4" },
         new object[] { "Belial #1 End Cutscene", "meDesign/Level/Theater/SpaceElevator/SE04/Theater/MV_SE04_WeaponMaster_RunAway.MV_SE04_WeaponMaster_RunAway'", "Spire 4" },
-        new object[] { "Space Logistics Complex discovery", "Space Logistics Complex discovery", "Spire 4" },
+        new object[] { "Space Logistics Complex discovery", "/Theater/SpaceElevator/SE05/Theaters/MV_SE05_EntranceView_Theater.MV_SE05_EntranceView_Theater", "Spire 4" },
         new object[] { "Raphael Space Center Discovery", "/Theater/SpaceElevator/SE06/Theater/MV_SE06_LobbyEntrance_Theater.MV_SE06_LobbyEntrance_Theater", "Spire 4" },
         new object[] { "Belial Fight Start", "/Theater/SpaceElevator/SE06/Theater/MV_SE06_LobbyEliteSpawn_Theater.MV_SE06_LobbyEliteSpawn_Theater", "Spire 4" },
         new object[] { "Belial Finisher", "/Theater/SpaceElevator/SE06/Theater/MV_SE06_LobbyEliteFinish_Theater.MV_SE06_LobbyEliteFinish_Theater", "Spire 4" },
