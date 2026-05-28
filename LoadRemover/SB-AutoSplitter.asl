@@ -246,3 +246,18 @@ start
         return true;
     }
 }
+
+update
+{
+	//debug
+ 	if (current.Event != old.Event && current.Event != null)
+	{
+		print("dbgFilter: \"" + current.Event + "\",");
+	}
+
+	/*if (old.event_id + 1 == current.event_id && current.event_id < 60 && current.event_id > 30)
+	{
+		print("dbgFilter: " + current.event_id);
+	}*/
+}
+
