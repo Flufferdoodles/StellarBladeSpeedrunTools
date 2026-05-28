@@ -84,6 +84,10 @@ init
 
 startup
 {
+	settings.Add("timer_ext", false, "Extended timer options");
+	settings.CurrentDefaultParent = "timer_ext";
+		settings.Add("time_igt", false, "Time with just IGT delta, this will skew from realtime during regular gameplay");
+	settings.CurrentDefaultParent = null;
 
     #region EventSplits
     vars.Events = new object[] {
@@ -205,8 +209,8 @@ startup
     }
     #endregion
 
-
-	vars.trackedTime = 0.0f; //TimeSpan.Zero;
+	//reset tracked IGT
+	vars.trackedTime = TimeSpan.Zero;
 }
 
 onStart
@@ -221,31 +225,43 @@ onStart
     }
     #endregion
 
-	//reset the IGT
-	vars.trackedTime = 0.0f; //TimeSpan.Zero;
+	//reset tracked IGT
+	vars.trackedTime = TimeSpan.Zero;
 }
 
 gameTime
 {
-	//ok things are working but instead of returning null we need to update our trackedTime to whatever livesplit is showing currently, it's occasionally ticking back and that is leading to descynchronisation with realtime
-	//doing nothing works fine for now, we're just getting a second or so of timesave when opening the pause menu etc.
+	//RealTimeSeconds is from GWorld, but resets on checkpoint reload/map change, so we track time by adding the delta between updates in vars.trackedTime
 	float delta = current.RealTimeSeconds - old.RealTimeSeconds;
-	float expectedDelta = (1000.0f / (float)refreshRate) * 0.001f; //idk this is innaccurate
-	print("delta: " + delta.ToString() + " expectedDelta: " + expectedDelta.ToString());
 
-	if (current.isLoading) {
-		//return null; //don't tick timer on the loading screen at all
+	if (settings["time_igt"]) { //we just want the unfiltered IGT
+		vars.trackedTime = TimeSpan.FromSeconds(vars.trackedTime.TotalSeconds + delta);
+		return vars.trackedTime;
+	}
+
+	if (current.isLoading) { //don't tick timer on the loading screen at all
+		vars.trackedTime = timer.CurrentTime.GameTime;
+		return vars.trackedTime;
 	}
 
 	if (delta < 0.01f)
-	{ //reloaded checkpoint or something, timer reset, do something?
-		print("reloaded checkpoint or something");
-		//return null;
+	{ //reloaded checkpoint or RealTimeSeconds rolled back, don't add delta
+		//print("reloaded checkpoint or something");
+		vars.trackedTime = timer.CurrentTime.GameTime;
+		return vars.trackedTime;
 	}
 
-	vars.trackedTime += delta;
-	print(timer.CurrentTime.GameTime.ToString());
-	return TimeSpan.FromSeconds(vars.trackedTime);
+	if (current.timeScale <= 1.0f) { //normal, act like LRT?
+		vars.trackedTime = timer.CurrentTime.GameTime;
+		return vars.trackedTime;
+	}
+
+	//vars.trackedTime.Add(TimeSpan.FromSeconds(delta));
+	//print(timer.CurrentTime.GameTime.ToString());
+	//return TimeSpan.FromSeconds(vars.trackedTime);
+	vars.trackedTime = TimeSpan.FromSeconds(vars.trackedTime.TotalSeconds + delta); //why does this work but not vars.trackedTime.Add LMFAO??
+	print(vars.trackedTime.ToString());
+	return vars.trackedTime;
 }
 
 isLoading
