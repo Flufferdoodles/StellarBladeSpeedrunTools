@@ -13,6 +13,9 @@ state("SB-Win64-Shipping", "1.4.1")
     bool isLoading : 0x70BE018;
     string512 Event : 0x7031700, 0x18, 0xF8, 0x2C;
     int event_id : 0x70C5BC4;
+	float timeScale : 0x06FFA8F8, 0x30, 0x268, 0x201C;
+	float TimeSeconds : 0x06FFA8F8, 0x748;
+	float RealTimeSeconds : 0x06FFA8F8, 0x74C;
 }
 
 state("SB-Win64-Shipping", "1.4.0")
@@ -55,6 +58,9 @@ state("SB-Win64-Shipping", "1.1.0")
     bool isLoading : 0x70FD960;
     string512 Event : 0x7070FA8, 0x18, 0xF8, 0x2C;
     int event_id : 0x7105438;
+	float timeScale : 0x07038898, 0x30, 0x268, 0x201C;
+	float TimeSeconds : 0x07038898, 0x748;
+	float RealTimeSeconds : 0x07038898, 0x74C;
 }
 
 init
@@ -197,9 +203,10 @@ startup
         }
         settings.Add(name, false, name, section);
     }
-
-
     #endregion
+
+
+	vars.trackedTime = 0.0f; //TimeSpan.Zero;
 }
 
 onStart
@@ -207,17 +214,44 @@ onStart
     #region Event Splits
     vars.eventRegistry.Clear();
     foreach (var evt in vars.Events) {
-    // evt[0] = name, evt[1] = event string, evt[2] = section
+		// evt[0] = name, evt[1] = event string, evt[2] = section
         if (settings[evt[0]] == true) {
             vars.AddEventToRegistry(evt[0], evt[1], evt[2]);
         }
     }
-
     #endregion
+
+	//reset the IGT
+	vars.trackedTime = 0.0f; //TimeSpan.Zero;
+}
+
+gameTime
+{
+	//ok things are working but instead of returning null we need to update our trackedTime to whatever livesplit is showing currently, it's occasionally ticking back and that is leading to descynchronisation with realtime
+	//doing nothing works fine for now, we're just getting a second or so of timesave when opening the pause menu etc.
+	float delta = current.RealTimeSeconds - old.RealTimeSeconds;
+	float expectedDelta = (1000.0f / (float)refreshRate) * 0.001f; //idk this is innaccurate
+	print("delta: " + delta.ToString() + " expectedDelta: " + expectedDelta.ToString());
+
+	if (current.isLoading) {
+		//return null; //don't tick timer on the loading screen at all
+	}
+
+	if (delta < 0.01f)
+	{ //reloaded checkpoint or something, timer reset, do something?
+		print("reloaded checkpoint or something");
+		//return null;
+	}
+
+	vars.trackedTime += delta;
+	print(timer.CurrentTime.GameTime.ToString());
+	return TimeSpan.FromSeconds(vars.trackedTime);
 }
 
 isLoading
 {
+	//if (current.timeScale != 1.0f)
+	//	return true;
     return current.isLoading;
 }
 
@@ -259,5 +293,12 @@ update
 	{
 		print("dbgFilter: " + current.event_id);
 	}*/
+
+	print("current timeScale " + current.timeScale);
+	//print("current TimeSeconds: " + current.TimeSeconds.ToString());
 }
 
+exit
+{
+	timer.IsGameTimePaused = true;
+}
