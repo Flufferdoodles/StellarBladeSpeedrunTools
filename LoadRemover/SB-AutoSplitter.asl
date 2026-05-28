@@ -251,7 +251,10 @@ gameTime
 		return vars.trackedTime;
 	}
 
-	if (current.timeScale <= 1.0f) { //normal, act like LRT?
+	if (current.timeScale <= 2.5f) {
+		//normal, act like LRT?
+		//Infinite Pierce speeds the game up by 2.5x very briefly, which is why we're comparing to that
+		//This is necessary or else our new IGT tracking will deviate too much from LRT, as RealWorldSeconds doesn't tick when opening pause menu/loading
 		vars.trackedTime = timer.CurrentTime.GameTime;
 		return vars.trackedTime;
 	}
