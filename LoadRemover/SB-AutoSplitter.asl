@@ -65,12 +65,23 @@ state("SB-Win64-Shipping", "1.1.0")
 
 init
 {
-    // 328835072 - ver 1.2.0
-    if (modules.First().ModuleMemorySize == 328835072)
-        version = "1.2.0";
-    // 356278272 - ver 1.1.0
-	if (modules.First().ModuleMemorySize == 356278272)
-		version = "1.1.0";
+	//assign version string
+	switch (modules.First().ModuleMemorySize)
+	{
+		default:
+			version = "unknown";
+			break;
+		case 337035264: // 337035264 - ver 1.4.1
+			version = "1.4.1";
+			break;
+		case 328835072: // 328835072 - ver 1.2.0
+			version = "1.2.0";
+			break;
+		case 356278272: // 356278272 - ver 1.1.0
+			version = "1.1.0";
+			break;
+	}
+
 
     vars.eventRegistry = new Dictionary<string, Tuple<string, string>>(); // split name, (event string, split category)
 
