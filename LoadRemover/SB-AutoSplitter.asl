@@ -16,6 +16,7 @@ state("SB-Win64-Shipping", "1.4.1")
 	float timeScale : 0x06FFA8F8, 0x30, 0x268, 0x201C;
 	float TimeSeconds : 0x06FFA8F8, 0x748;
 	float UnpausedTimeSeconds : 0x06FFA8F8, 0x74C;
+	int cutsceneFrameNum : 0x07031700, 0x20, 0x0, 0x100;
 }
 
 state("SB-Win64-Shipping", "1.4.0")
@@ -61,6 +62,7 @@ state("SB-Win64-Shipping", "1.1.0")
 	float timeScale : 0x07038898, 0x30, 0x268, 0x201C;
 	float TimeSeconds : 0x07038898, 0x748;
 	float UnpausedTimeSeconds : 0x07038898, 0x74C;
+	int cutsceneFrameNum : 0x07070FA8, 0x20, 0x0, 0x100;
 }
 
 init
@@ -82,6 +84,15 @@ init
 			break;
 	}
 
+	if (version == "1.1.0") {
+		vars.timeScalePtr = new DeepPointer(0x07038898, 0x30, 0x268, 0x201C);
+	}
+	else if (version == "1.4.1") {//FIXME: make sure this size is the same for EGS?
+		vars.timeScalePtr = new DeepPointer(0x06FFA8F8, 0x30, 0x268, 0x201C);
+	}
+	else {
+		vars.timeScalePtr = null;
+	}
 
     vars.eventRegistry = new Dictionary<string, Tuple<string, string>>(); // split name, (event string, split category)
 
@@ -98,6 +109,7 @@ startup
 	settings.Add("timer_ext", false, "Extended timer options");
 	settings.CurrentDefaultParent = "timer_ext";
 		settings.Add("time_igt", false, "Time with just IGT delta, this will skew from realtime during regular gameplay");
+		settings.Add("cutscene_speedup", false, "Speedup unskippable cutscenes and keep LRT in-sync");
 	settings.CurrentDefaultParent = null;
 
     #region EventSplits
@@ -222,6 +234,8 @@ startup
 
 	//reset tracked IGT
 	vars.trackedTime = TimeSpan.Zero;
+	vars.EventString = null;
+	vars.inCutscene = false;
 }
 
 onStart
@@ -298,6 +312,8 @@ split
 
 start
 {
+	if (current.Event != old.Event && current.Event == "meDesign/Level/Theater/Matrix/MatrixXI/ME06/Theaters/MV_ME06_Tachy_Die_Theater.MV_ME06_Tachy_Die_Theater'")
+		return true; //testme
 	// 47 to 48 -- press continue
 	// 53 to 54 -- new game or new game plus
 	// 49 to 50 -- ng or ng+ on some systems, unsure what the difference is
@@ -310,7 +326,8 @@ update
 	//debug
  	if (current.Event != old.Event && current.Event != null)
 	{
-		print("dbgFilter: \"" + current.Event + "\",");
+		print("dbgFilter: current.Event: \"" + current.Event + "\",");
+		vars.EventString = current.Event; //track this here since it gets 0'd out on next update
 	}
 
 	if (current.event_id == (old.event_id + 1) && current.event_id < 60 && current.event_id > 30)
@@ -318,8 +335,63 @@ update
 		print("dbgFilter: current.event_id: " + current.event_id + " old.event_id: " + old.event_id);
 	}
 
-	print("current timeScale " + current.timeScale);
 	//print("current TimeSeconds: " + current.TimeSeconds.ToString());
+	if (current.cutsceneFrameNum != old.cutsceneFrameNum)
+		print("current cutscene framenumber: " + current.cutsceneFrameNum.ToString());
+	if (settings["cutscene_speedup"] && vars.timeScalePtr != null && vars.EventString != null)
+	{
+		print("vars.EventString: " + vars.EventString);
+		float timeScaleOverride = -1.0f;
+		int speed_startFrame = -1;
+		int speed_endFrame = -1;
+
+		if (current.cutsceneFrameNum > old.cutsceneFrameNum) //do this while the cutsceneFrameNum is being incremented
+		{
+			vars.inCutscene = true;
+			if (vars.EventString == "meDesign/Level/Theater/Matrix/MatrixXI/ME06/Theaters/MV_ME06_Tachy_Die_Theater.MV_ME06_Tachy_Die_Theater'")
+			{
+				speed_startFrame = 650; //start after KILLER animation
+				speed_endFrame = 8500; //stop just before the cutscene ends?
+			}
+		}
+		else if (current.cutsceneFrameNum == old.cutsceneFrameNum) { //idk idk idk
+			vars.inCutscene = false;
+			//vars.EventString = null;
+		}
+
+		if (vars.inCutscene)
+		{
+				if (speed_endFrame != -1 && current.cutsceneFrameNum >= speed_endFrame) {
+					//print("STOP!!!!!");
+					timeScaleOverride = 1.0f;
+				}
+				else if (speed_startFrame != -1 && current.cutsceneFrameNum >= speed_startFrame) {
+					//print("fast fwd");
+					timeScaleOverride = 67.67f;
+				}
+		}
+		else if (current.timeScale > 2.5f) { //this is a fallback, need a better way to check if we *just* left the cutscene? 
+			//I don't like relying on the 2.5f magic number everywhere
+			timeScaleOverride = 1.0f; //shouldn't get here, but just incase don't leave us sped up if we aren't trying to speed up anything
+		}
+
+		if (timeScaleOverride != -1.0f && timeScaleOverride != current.timeScale)
+		{
+			IntPtr addr;
+			if (vars.timeScalePtr.DerefOffsets(game, out addr)) {
+				game.WriteValue<float>(addr, timeScaleOverride);
+			}
+		}
+
+		if (current.timeScale > 1.0f) print("current timeScale " + current.timeScale);
+		//a kind of debug assertion popup, using this to make sure we don't go any faster than 2.5f during gameplay
+		if (current.timeScale > 2.5f && timeScaleOverride != -1.0f && !vars.inCutscene) {
+			MessageBox.Show(
+				"Timescale went over 2.5f!!! (" + current.timeScale.ToString() + ")\n",
+				"LiveSplit | STELLAR BLADE", 
+				MessageBoxButtons.OK, MessageBoxIcon.Question);
+		}
+	}
 }
 
 exit
