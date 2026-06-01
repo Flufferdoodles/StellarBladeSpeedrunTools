@@ -15,7 +15,7 @@ state("SB-Win64-Shipping", "1.4.1")
     int event_id : 0x70C5BC4;
 	float timeScale : 0x06FFA8F8, 0x30, 0x268, 0x201C;
 	float TimeSeconds : 0x06FFA8F8, 0x748;
-	float RealTimeSeconds : 0x06FFA8F8, 0x74C;
+	float UnpausedTimeSeconds : 0x06FFA8F8, 0x74C;
 }
 
 state("SB-Win64-Shipping", "1.4.0")
@@ -60,7 +60,7 @@ state("SB-Win64-Shipping", "1.1.0")
     int event_id : 0x7105438;
 	float timeScale : 0x07038898, 0x30, 0x268, 0x201C;
 	float TimeSeconds : 0x07038898, 0x748;
-	float RealTimeSeconds : 0x07038898, 0x74C;
+	float UnpausedTimeSeconds : 0x07038898, 0x74C;
 }
 
 init
@@ -242,8 +242,8 @@ onStart
 
 gameTime
 {
-	//RealTimeSeconds is from GWorld, but resets on checkpoint reload/map change, so we track time by adding the delta between updates in vars.trackedTime
-	float delta = current.RealTimeSeconds - old.RealTimeSeconds;
+	//UnpausedTimeSeconds is from GWorld, but resets on checkpoint reload/map change, so we track time by adding the delta between updates in vars.trackedTime
+	float delta = current.UnpausedTimeSeconds - old.UnpausedTimeSeconds;
 
 	if (settings["time_igt"]) { //we just want the unfiltered IGT
 		vars.trackedTime = TimeSpan.FromSeconds(vars.trackedTime.TotalSeconds + delta);
@@ -256,7 +256,7 @@ gameTime
 	}
 
 	if (delta < 0.01f)
-	{ //reloaded checkpoint or RealTimeSeconds rolled back, don't add delta
+	{ //reloaded checkpoint or UnpausedTimeSeconds rolled back, don't add delta
 		//print("reloaded checkpoint or something");
 		vars.trackedTime = timer.CurrentTime.GameTime;
 		return vars.trackedTime;
@@ -280,8 +280,6 @@ gameTime
 
 isLoading
 {
-	//if (current.timeScale != 1.0f)
-	//	return true;
     return current.isLoading;
 }
 
