@@ -298,15 +298,11 @@ split
 
 start
 {
-    if (
-        (current.event_id == 54 || current.event_id == 50 || current.event_id == 53 || current.event_id == 47)
-        && (old.event_id + 1) == current.event_id
-    ) {
-        // 47 to 48 -- press continue
-        // 53 to 54 -- new game or new game plus
-        // 49 to 50 -- ng or ng+ on some systems, unsure what the difference is
-        return true;
-    }
+	// 47 to 48 -- press continue
+	// 53 to 54 -- new game or new game plus
+	// 49 to 50 -- ng or ng+ on some systems, unsure what the difference is
+	//return ((current.event_id == 54 || current.event_id == 50 || current.event_id == 53 || current.event_id== 47) && (old.event_id + 1) == current.event_id);
+	return (current.event_id == (old.event_id + 1) && current.event_id < 60 && current.event_id > 30);
 }
 
 update
@@ -317,10 +313,10 @@ update
 		print("dbgFilter: \"" + current.Event + "\",");
 	}
 
-	/*if (old.event_id + 1 == current.event_id && current.event_id < 60 && current.event_id > 30)
+	if (current.event_id == (old.event_id + 1) && current.event_id < 60 && current.event_id > 30)
 	{
-		print("dbgFilter: " + current.event_id);
-	}*/
+		print("dbgFilter: current.event_id: " + current.event_id + " old.event_id: " + old.event_id);
+	}
 
 	print("current timeScale " + current.timeScale);
 	//print("current TimeSeconds: " + current.TimeSeconds.ToString());
