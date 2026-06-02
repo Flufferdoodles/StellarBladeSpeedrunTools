@@ -334,6 +334,7 @@ update
 	{
 		print("dbgFilter: current.Event: \"" + current.Event + "\",");
 		vars.EventString = current.Event; //track this here since it gets 0'd out on next update
+		current.cutsceneFrameNum = -1; //reset this because the value in this update is sometimes from the previous sequence
 	}
 
 	if (current.event_id == (old.event_id + 1) && current.event_id < 60 && current.event_id > 30)
@@ -357,7 +358,8 @@ update
 		int speed_endFrame = -1;
 
 		//print("vars.EventString: " + vars.EventString);
-		if (current.cutsceneFrameNum > old.cutsceneFrameNum) //do this while the cutsceneFrameNum is being incremented
+		if (current.cutsceneFrameNum != -1 &&
+				current.cutsceneFrameNum > old.cutsceneFrameNum) //do this while the cutsceneFrameNum is being incremented
 		{
 			int frameNum = current.cutsceneFrameNum; //saves some typing
 
