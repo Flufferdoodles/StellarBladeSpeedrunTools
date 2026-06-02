@@ -303,6 +303,13 @@ split
 			}
 		}
 	}
+	//auto end
+	if (vars.EventString == "/Theater/Nest/Nest40/Theater/MV_Nest_BattleAdam_After_03.MV_Nest_BattleAdam_After_03") {
+		if (current.cutsceneFrameNum >= 3520 && current.cutsceneFrameNum <= 8424) { //cutsceneFrameNum can be read off from the previous cutscene, so check that we're not that far ahead first
+			vars.EventString = null;
+			return true;
+		}
+	}
 }
 
 start
