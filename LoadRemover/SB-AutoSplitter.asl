@@ -72,26 +72,20 @@ init
 	{
 		default:
 			version = "unknown";
+			vars.timeScalePtr = null;
 			break;
 		case 337035264: // 337035264 - ver 1.4.1
-			version = "1.4.1";
+			version = "1.4.1"; //FIXME: make sure this size is the same for EGS?
+			vars.timeScalePtr = new DeepPointer(0x06FFA8F8, 0x30, 0x268, 0x201C);
 			break;
 		case 328835072: // 328835072 - ver 1.2.0
 			version = "1.2.0";
+			vars.timeScalePtr = null;
 			break;
 		case 356278272: // 356278272 - ver 1.1.0
 			version = "1.1.0";
+			vars.timeScalePtr = new DeepPointer(0x07038898, 0x30, 0x268, 0x201C);
 			break;
-	}
-
-	if (version == "1.1.0") {
-		vars.timeScalePtr = new DeepPointer(0x07038898, 0x30, 0x268, 0x201C);
-	}
-	else if (version == "1.4.1") {//FIXME: make sure this size is the same for EGS?
-		vars.timeScalePtr = new DeepPointer(0x06FFA8F8, 0x30, 0x268, 0x201C);
-	}
-	else {
-		vars.timeScalePtr = null;
 	}
 
     vars.eventRegistry = new Dictionary<string, Tuple<string, string>>(); // split name, (event string, split category)
@@ -109,6 +103,7 @@ startup
 	settings.Add("timer_ext", false, "Extended timer options");
 	settings.CurrentDefaultParent = "timer_ext";
 		settings.Add("time_igt", false, "Time with just IGT delta, this will skew from realtime during regular gameplay");
+		settings.Add("eventstring_start", false, "Start timer on first cutscene, please set your LiveSplit to start at 0.97");
 		settings.Add("cutscene_speedup", false, "Speedup unskippable cutscenes and keep LRT in-sync");
 	settings.CurrentDefaultParent = null;
 
@@ -313,7 +308,11 @@ split
 start
 {
 	if (current.Event != old.Event && current.Event == "meDesign/Level/Theater/Matrix/MatrixXI/ME06/Theaters/MV_ME06_Tachy_Die_Theater.MV_ME06_Tachy_Die_Theater'")
-		return true; //testme
+		return true; //for testing
+
+	if (settings["eventstring_start"]) //since our event_id thing isn't working reliably on everyone's system
+		return (current.Event != old.Event && current.Event == "/Theater/StarsDescent/Prologue/Theater/MV_Prologue_Main.MV_Prologue_Main");
+
 	// 47 to 48 -- press continue
 	// 53 to 54 -- new game or new game plus
 	// 49 to 50 -- ng or ng+ on some systems, unsure what the difference is
