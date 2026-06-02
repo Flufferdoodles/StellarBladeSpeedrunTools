@@ -259,7 +259,7 @@ gameTime
 		return vars.trackedTime;
 	}
 
-	if (current.isLoading) { //don't tick timer on the loading screen at all
+	if (current.isLoading || timer.IsGameTimePaused) { //don't tick timer on the loading screen at all
 		vars.trackedTime = timer.CurrentTime.GameTime;
 		return vars.trackedTime;
 	}
@@ -344,21 +344,129 @@ update
 	//print("current TimeSeconds: " + current.TimeSeconds.ToString());
 	if (current.cutsceneFrameNum != old.cutsceneFrameNum)
 		print("current cutscene framenumber: " + current.cutsceneFrameNum.ToString());
+	// Alright so here's where we're at, we have a consistent pointer to the frame number of the cutscene that is currently playing,
+	// the problem is the frame numbers are relative to the individual "TheaterTrack" which is going to be camera cuts or many other things,
+	// So a cutscene may start at frame 0 and when it reaches its next track the frameNumber will get set to -700 or something
+	// LevelSequencePlayers seem to just run through an array of TheaterTracks
+	// If we want to remove all of these conditional hacks below we need to locate a pointer to something representing the current TheaterTracs
 	if (settings["cutscene_speedup"] && vars.timeScalePtr != null && vars.EventString != null)
 	{
-		print("vars.EventString: " + vars.EventString);
 		float timeScaleOverride = -1.0f;
+		float timeScaleDesired = 67.67f; //override the speedup rate depending on the scene
 		int speed_startFrame = -1;
 		int speed_endFrame = -1;
 
+		//print("vars.EventString: " + vars.EventString);
 		if (current.cutsceneFrameNum > old.cutsceneFrameNum) //do this while the cutsceneFrameNum is being incremented
 		{
-			vars.inCutscene = true;
-			if (vars.EventString == "meDesign/Level/Theater/Matrix/MatrixXI/ME06/Theaters/MV_ME06_Tachy_Die_Theater.MV_ME06_Tachy_Die_Theater'")
-			{
-				speed_startFrame = 650; //start after KILLER animation
-				speed_endFrame = 8500; //stop just before the cutscene ends?
+			int frameNum = current.cutsceneFrameNum; //saves some typing
+
+			vars.inCutscene = true;			
+			//can't put this in a switch? ok... lol
+			if (vars.EventString == "/Theater/Xion/Xion05/Theater/MV_Xion05_InsideLift_GoingUp_Leave_WithAdamLily_Main2.MV_Xion05_InsideLift_GoingUp_Leave_WithAdamLily_Main2") {
+				//riding up lift in xion 1 (removeme?)
+				speed_startFrame = -240;
+				speed_endFrame = 140;
+				timeScaleDesired = 10.0f;
 			}
+			else if (vars.EventString == "/Theater/Xion/Xion07/Theater/Dialogue/Dialogue_Xion07_Phase1_HyperDriveRoomEnter_Theater.Dialogue_Xion07_Phase1_HyperDriveRoomEnter_Theater") {
+				//first long unskippable bit into mashable hypercell cutscene
+				speed_startFrame = -1030;
+				speed_endFrame = -20;
+				timeScaleDesired = 20.0f;
+			}
+			else if (vars.EventString == "/Theater/Xion/Xion01/Theater/Dialogue/Dialogue_Xion01_Phase1_SmallTalk_Street2_Theater.Dialogue_Xion01_Phase1_SmallTalk_Street2_Theater") {
+				//left orcal's chamber, long establishing shot
+				//it starts from 0 and increments to ~120 when first entering, then starts at -690 after fadeout
+				//this one may need TLC hacks
+				speed_startFrame = -680;
+				//speed_endFrame = -150;
+				if (frameNum < -50) speed_endFrame = -75;
+				timeScaleDesired = 10.0f;
+			}
+			else if (vars.EventString == "/Theater/Xion/Xion01/Theater/MV_Xion01_DroneUpgrade_Theater.MV_Xion01_DroneUpgrade_Theater") {
+				//IT'S AN EVOLUTION!!!
+				speed_startFrame = 2472;
+				speed_endFrame = 3072;
+			}
+			else if (vars.EventString == "/Theater/Xion/Xion01/Theater/Dialogue/Dialogue_Xion01_Phase2_Agit_WithAdam_Theater.Dialogue_Xion01_Phase2_Agit_WithAdam_Theater") {
+				//"the wasteland is that way.."
+				speed_startFrame = 4200;
+				speed_endFrame = 4850;
+				timeScaleDesired = 10.0f;
+			}
+			else if (vars.EventString == "/Theater/Xion/Xion01/Theater/Dialogue/Dialogue_Xion01_Phase3_SmallTalkAfterChamber_Theater.Dialogue_Xion01_Phase3_SmallTalkAfterChamber_Theater") {
+				//xion 2 cutscene after orcal/hypercell chamber (we skip this in any%)
+				speed_startFrame = 120; //would be nicer to start this earlier but it has the same issue where positive framecount for fade out and then the actual scene starts at -120
+				speed_endFrame = 1750;
+			}
+			else if (vars.EventString == "meDesign/Level/Theater/Matrix/MatrixXI/ME06/Theaters/MV_ME06_Tachy_Die_Theater.MV_ME06_Tachy_Die_Theater'") {
+				//tachy finisher
+				speed_startFrame = 650; //start after KILLER animation
+				speed_endFrame = 8500; //stop just before we fade out?
+			}
+			else if (vars.EventString == "/Theater/Xion/Xion01/Theater/MV_Xion01_AfterMatrix_Theater.MV_Xion01_AfterMatrix_Theater") { //xion fadein after tachy
+				speed_startFrame = 10; //start after fadein?
+				speed_endFrame = 500; //stop before fadeout?
+			}
+			else if (vars.EventString == "/Theater/Xion/Xion06/Theater/Dialogue/Dialogue_Xion06_Phase3_AfterMatrix_TalkAfterLanding_Theater.Dialogue_Xion06_Phase3_AfterMatrix_TalkAfterLanding_Theater") {
+				//skip long establishing shot in orcal's chamber
+				speed_startFrame = -750;
+				speed_endFrame = -150;
+				timeScaleDesired = 10.0f;
+			}
+			else if (vars.EventString == "/Theater/Xion/Xion01/Theater/MV_Xion01_Legacy2_Hologram.MV_Xion01_Legacy2_Hologram") {
+				speed_startFrame = -450;
+				speed_endFrame = 5900;
+				if (current.cutsceneFrameNum >= 5900) {
+					//hack, this is right before the black screen where we get the "skip" prompt, but it rewinds the frame number to -1290
+					//we don't want to continue fast forwarding here so we'll change the EventString instead
+					vars.EventString = null;
+					speed_endFrame = 4750;
+				}
+			}
+			else if (vars.EventString == "/Theater/AbyssLabor/AYL03/Theater/MV_AYL03_Legacy3_Hologram_Theater.MV_AYL03_Legacy3_Hologram_Theater") {
+				//legacy after maelstrom kill in abyss levoire
+				//speed_startFrame = 1100;
+				//speed_endFrame = 5500;
+				//ok we're gonna hack the fuck out of this
+				if (frameNum >= 1370)
+					vars.EventString = "MV_AYL03_Legacy3_Hologram_Theater.MV_AYL03_Legacy3_Hologram_Theater_HACK"; //we will check our frame range here
+			}
+			else if (vars.EventString == "MV_AYL03_Legacy3_Hologram_Theater.MV_AYL03_Legacy3_Hologram_Theater_HACK") {
+				//hey it worked
+				speed_startFrame = -25;
+				speed_endFrame = 5500;
+			}
+			else if (vars.EventString == "/Theater/Xion/Xion01/Theater/MV_Xion01_PODAfterAYLLanding_Theater.MV_Xion01_PODAfterAYLLanding_Theater") {
+				//landing after abyss
+				speed_startFrame = 630;
+				speed_endFrame = 1050;
+			}
+			else if (vars.EventString == "/Theater/SpaceElevator/SE10/Theater/MV_SE10_AlphaNative_Ending_Master.MV_SE10_AlphaNative_Ending_Master") {
+				//democrawler into demogorgon
+				speed_startFrame = 3200;
+				speed_endFrame = 5250;
+			}
+			else if (vars.EventString == "/Theater/Xion/Xion01/Theater/Dialogue/Dialogue_Xion01_Phase5_PodAgitLanding_Theater.Dialogue_Xion01_Phase5_PodAgitLanding_Theater") {
+				speed_startFrame = 20;
+				speed_endFrame = 1750;
+			}
+			else if (vars.EventString == "/Theater/Xion/Xion07/Theater/Dialogue/Dialogue_Xion07_Phase5_DyingElder_Theater.Dialogue_Xion07_Phase5_DyingElder_Theater") {
+				//orcal deadge sadge
+				speed_startFrame = -260;
+				speed_endFrame = 6767;
+			}
+			else if (vars.EventString == "/Theater/WasteLandA/WLA10/Theater/MV_WLA_Nest_RavenBattle_QTE_Master.MV_WLA_Nest_RavenBattle_QTE_Master") {
+				//raven finisher
+				speed_startFrame = 1000;
+				speed_endFrame = 12300;
+			}
+			else {
+				speed_startFrame = -1;
+				speed_endFrame = -1;
+			}
+
 		}
 		else if (current.cutsceneFrameNum == old.cutsceneFrameNum) { //idk idk idk
 			vars.inCutscene = false;
@@ -368,17 +476,20 @@ update
 		if (vars.inCutscene)
 		{
 				if (speed_endFrame != -1 && current.cutsceneFrameNum >= speed_endFrame) {
-					//print("STOP!!!!!");
+					print("STOP!!!!!");
 					timeScaleOverride = 1.0f;
+					vars.EventString = null; //maybe we just want to do this here? testme..
+					//nah this breaks ones that start with a positive framenumber FUCK!!!!!!
 				}
 				else if (speed_startFrame != -1 && current.cutsceneFrameNum >= speed_startFrame) {
-					//print("fast fwd");
-					timeScaleOverride = 67.67f;
+					print("fast fwd");
+					timeScaleOverride = timeScaleDesired;
 				}
 		}
 		else if (current.timeScale > 2.5f) { //this is a fallback, need a better way to check if we *just* left the cutscene? 
 			//I don't like relying on the 2.5f magic number everywhere
-			timeScaleOverride = 1.0f; //shouldn't get here, but just incase don't leave us sped up if we aren't trying to speed up anything
+			if (timer.CurrentPhase == TimerPhase.Running)
+				timeScaleOverride = 1.0f; //shouldn't get here, but just incase don't leave us sped up if we aren't trying to speed up anything
 		}
 
 		if (timeScaleOverride != -1.0f && timeScaleOverride != current.timeScale)
@@ -391,7 +502,7 @@ update
 
 		if (current.timeScale > 1.0f) print("current timeScale " + current.timeScale);
 		//a kind of debug assertion popup, using this to make sure we don't go any faster than 2.5f during gameplay
-		if (current.timeScale > 2.5f && timeScaleOverride != -1.0f && !vars.inCutscene) {
+		if (false && current.timeScale > 2.5f && current.timeScale != old.timeScale && timeScaleOverride != -1.0f && !vars.inCutscene) {
 			MessageBox.Show(
 				"Timescale went over 2.5f!!! (" + current.timeScale.ToString() + ")\n",
 				"LiveSplit | STELLAR BLADE", 
