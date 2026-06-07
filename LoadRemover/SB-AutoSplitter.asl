@@ -75,7 +75,7 @@ init
 			vars.timeScalePtr = null;
 			break;
 		case 337035264: // 337035264 - ver 1.4.1
-			version = "1.4.1"; //FIXME: make sure this size is the same for EGS?
+			version = "1.4.1";
 			vars.timeScalePtr = new DeepPointer(0x06FFA8F8, 0x30, 0x268, 0x201C);
 			break;
 		case 328835072: // 328835072 - ver 1.2.0
@@ -88,14 +88,13 @@ init
 			break;
 	}
 
-    vars.eventRegistry = new Dictionary<string, Tuple<string, string>>(); // split name, (event string, split category)
+	vars.AddEventToRegistry = (Func<string, string, string, bool>)((name, eventString, category) => {
+		if (settings[name] == false)
+			return false;
 
-    vars.AddEventToRegistry = (Func<string, string, string, bool>)((name, eventString, category) => {
-        if (settings[name] == false)
-            return false;
-        vars.eventRegistry.Add(name, new Tuple<string, string>(eventString, category));
-        return true;
-    });
+		vars.eventRegistry.Add(name, new Tuple<string, string>(eventString, category));
+		return true;
+	});
 }
 
 startup
@@ -108,6 +107,8 @@ startup
 	settings.CurrentDefaultParent = null;
 
     #region EventSplits
+	vars.eventRegistry = new Dictionary<string, Tuple<string, string>>(); // split name, (event string, split category)
+
     vars.Events = new object[] {
         // Format: { name, eventString, section }
 
