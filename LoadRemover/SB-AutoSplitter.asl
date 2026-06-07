@@ -260,10 +260,6 @@ gameTime
 		return vars.trackedTime;
 	}
 
-	if (current.isLoading || timer.IsGameTimePaused) { //don't tick timer on the loading screen at all
-		vars.trackedTime = timer.CurrentTime.GameTime;
-		return vars.trackedTime;
-	}
 
 	if (delta < 0.01f)
 	{ //reloaded checkpoint or UnpausedTimeSeconds rolled back, don't add delta
@@ -306,7 +302,7 @@ split
 	}
 	//auto end
 	if (vars.EventString == "/Theater/Nest/Nest40/Theater/MV_Nest_BattleAdam_After_03.MV_Nest_BattleAdam_After_03") {
-		if (current.cutsceneFrameNum >= 3520 && current.cutsceneFrameNum <= 8424) { //cutsceneFrameNum can be read off from the previous cutscene, so check that we're not that far ahead first
+		if (current.cutsceneFrameNum >= 3520 && current.cutsceneFrameNum <= 4424) { //cutsceneFrameNum can be read off from the previous cutscene, so check that we're not that far ahead first
 			vars.EventString = null;
 			return true;
 		}
@@ -366,7 +362,63 @@ update
 
 			vars.inCutscene = true;			
 			//can't put this in a switch? ok... lol
-			if (vars.EventString == "/Theater/Xion/Xion05/Theater/MV_Xion05_InsideLift_GoingUp_Leave_WithAdamLily_Main2.MV_Xion05_InsideLift_GoingUp_Leave_WithAdamLily_Main2") {
+			if (vars.EventString == "/Theater/DrownedEidosDistrict/DED01/Theaters/MV_DED01_Intro_Master.MV_DED01_Intro_Master") {
+				speed_startFrame = -1160;
+				speed_endFrame = -300;
+			}
+			//dialogue mashers are NOT working with this speedup method, we wind up losing a TON of time
+			//the delay before you can mash isn't time dilated, so need to investigate other ways around this
+			/*else if (vars.EventString == "/Theater/DrownedEidosDistrict/DED03/Theaters/MV_DED03_DropPod.MV_DED03_DropPod") {
+				speed_startFrame = 5100;
+				speed_endFrame = 5720;
+				timeScaleDesired = 20.0f;
+				if (frameNum >= 5700) {
+					vars.EventString = "MV_DED03_DropPod_Tetrapod_Scene"; //hack
+					current.cutsceneFrameNumber = -1;
+					return;
+				}
+			}
+			else if (vars.EventString == "MV_DED03_DropPod_Tetrapod_Scene") { //this is a dialogue masher
+				speed_startFrame = -240;
+				speed_endFrame = 5920;
+				timeScaleDesired = 6.0f;
+				vars.inDialogueMasher = true;
+				if (frameNum >= 5900) {
+					vars.EventString = "MV_DED03_DropPod_Tetrapod_Scene_Post_Cooperate"; //will need to check frame numbers for the other choice
+					current.cutsceneFrameNumber = -1;
+					return;
+				}
+			}
+			else if (vars.EventString == "MV_DED03_DropPod_Tetrapod_Scene_Post_Cooperate") {
+				speed_startFrame = 10;
+				speed_endFrame = 1620;
+				timeScaleDesired = 6.0f;
+				vars.inDialogueMasher = true;
+				if (frameNum >= 1600) { //fuck this is not gonna work lol
+					vars.EventString = "MV_DED03_DropPod_Tetrapod_Scene_Post_Cooperate_2";
+					current.cutsceneFrameNumber = -1;
+					return;
+				}
+			}
+			else if (vars.EventString == "MV_DED03_DropPod_Tetrapod_Scene_Post_Cooperate_2") { //fuck you adam
+				speed_startFrame = 10;
+				speed_endFrame = 600;
+				timeScaleDesired = 6.0f;
+				vars.inDialogueMasher = true;
+			}*/
+			else if (vars.EventString == "/Theater/Xion/Xion05/Theater/MV_Xion05_InsideLift_GoingDown_Enter_Main1.MV_Xion05_InsideLift_GoingDown_Enter_Main1") {
+				//going down xion elevator
+				speed_startFrame = 10;
+				speed_endFrame = 450;
+				timeScaleDesired = 10.0f;
+			}
+			else if (vars.EventString == "/Theater/Xion/Xion05/Theater/MV_Xion05_InsideLift_GoingDown_Leave_Main2.MV_Xion05_InsideLift_GoingDown_Leave_Main2") {
+				//getting off xion elevator (alone)
+				speed_startFrame = -225;
+				speed_endFrame = 250;
+				timeScaleDesired = 10.0f;
+			}
+			else if (vars.EventString == "/Theater/Xion/Xion05/Theater/MV_Xion05_InsideLift_GoingUp_Leave_WithAdamLily_Main2.MV_Xion05_InsideLift_GoingUp_Leave_WithAdamLily_Main2") {
 				//riding up lift in xion 1 (removeme?)
 				speed_startFrame = -240;
 				speed_endFrame = 140;
@@ -384,18 +436,20 @@ update
 				//this one may need TLC hacks
 				speed_startFrame = -680;
 				//speed_endFrame = -150;
-				if (frameNum < -50) speed_endFrame = -75;
+				if (frameNum < -50)
+					speed_endFrame = -75;
 				timeScaleDesired = 10.0f;
 			}
 			else if (vars.EventString == "/Theater/Xion/Xion01/Theater/MV_Xion01_DroneUpgrade_Theater.MV_Xion01_DroneUpgrade_Theater") {
 				//IT'S AN EVOLUTION!!!
 				speed_startFrame = 2472;
 				speed_endFrame = 3072;
+				timeScaleDesired = 10.0f;
 			}
 			else if (vars.EventString == "/Theater/Xion/Xion01/Theater/Dialogue/Dialogue_Xion01_Phase2_Agit_WithAdam_Theater.Dialogue_Xion01_Phase2_Agit_WithAdam_Theater") {
 				//"the wasteland is that way.."
 				speed_startFrame = 4200;
-				speed_endFrame = 4850;
+				speed_endFrame = 4950;
 				timeScaleDesired = 10.0f;
 			}
 			else if (vars.EventString == "/Theater/Xion/Xion01/Theater/Dialogue/Dialogue_Xion01_Phase3_SmallTalkAfterChamber_Theater.Dialogue_Xion01_Phase3_SmallTalkAfterChamber_Theater") {
@@ -437,7 +491,7 @@ update
 					vars.EventString = "MV_AYL03_Legacy3_Hologram_Theater.MV_AYL03_Legacy3_Hologram_Theater_HACK"; //we will check our frame range here
 			}
 			else if (vars.EventString == "MV_AYL03_Legacy3_Hologram_Theater.MV_AYL03_Legacy3_Hologram_Theater_HACK") {
-				//hey it worked
+				//this is when we actually start the legacy section (different track, we hacked the string in the block above)
 				speed_startFrame = -25;
 				speed_endFrame = 5500;
 			}
@@ -469,15 +523,13 @@ update
 				speed_startFrame = -1;
 				speed_endFrame = -1;
 			}
-
 		}
 		else if (current.cutsceneFrameNum == old.cutsceneFrameNum) { //idk idk idk
 			vars.inCutscene = false;
 			//vars.EventString = null;
 		}
 
-		if (vars.inCutscene)
-		{
+		if (vars.inCutscene) {
 				if (speed_endFrame != -1 && current.cutsceneFrameNum >= speed_endFrame) {
 					print("STOP!!!!!");
 					timeScaleOverride = 1.0f;
@@ -489,7 +541,7 @@ update
 					timeScaleOverride = timeScaleDesired;
 				}
 		}
-		else if (current.timeScale > 2.5f) { //this is a fallback, need a better way to check if we *just* left the cutscene? 
+		else if (current.timeScale > 2.5f) { //this is a fallback, need a better way to check if we *just* left the cutscene?
 			//I don't like relying on the 2.5f magic number everywhere
 			if (timer.CurrentPhase == TimerPhase.Running)
 				timeScaleOverride = 1.0f; //shouldn't get here, but just incase don't leave us sped up if we aren't trying to speed up anything
@@ -508,7 +560,7 @@ update
 		if (false && current.timeScale > 2.5f && current.timeScale != old.timeScale && timeScaleOverride != -1.0f && !vars.inCutscene) {
 			MessageBox.Show(
 				"Timescale went over 2.5f!!! (" + current.timeScale.ToString() + ")\n",
-				"LiveSplit | STELLAR BLADE", 
+				"LiveSplit | STELLAR BLADE",
 				MessageBoxButtons.OK, MessageBoxIcon.Question);
 		}
 	}
