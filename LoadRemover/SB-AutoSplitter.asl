@@ -102,7 +102,6 @@ startup
 	settings.Add("timer_ext", false, "Extended timer options");
 	settings.CurrentDefaultParent = "timer_ext";
 		settings.Add("time_igt", false, "Time with just IGT delta, this will skew from realtime during regular gameplay");
-		settings.Add("eventstring_start", false, "Start timer on first cutscene, please set your LiveSplit to start at 0.97");
 		settings.Add("cutscene_speedup", false, "Speedup unskippable cutscenes and keep LRT in-sync");
 	settings.CurrentDefaultParent = null;
 
@@ -247,11 +246,21 @@ onStart
     #endregion
 
 	//reset tracked IGT
-	vars.trackedTime = TimeSpan.Zero;
+	vars.trackedTime = timer.CurrentTime.GameTime;
+}
+
+isLoading
+{
+    return current.isLoading;
 }
 
 gameTime
-{
+{	
+	if (timer.IsGameTimePaused || current.isLoading) { //don't tick timer on the loading screen at all
+		vars.trackedTime = timer.CurrentTime.GameTime;
+		return vars.trackedTime;
+	}
+
 	//UnpausedTimeSeconds is from GWorld, but resets on checkpoint reload/map change, so we track time by adding the delta between updates in vars.trackedTime
 	float delta = current.UnpausedTimeSeconds - old.UnpausedTimeSeconds;
 
@@ -259,7 +268,6 @@ gameTime
 		vars.trackedTime = TimeSpan.FromSeconds(vars.trackedTime.TotalSeconds + delta);
 		return vars.trackedTime;
 	}
-
 
 	if (delta < 0.01f)
 	{ //reloaded checkpoint or UnpausedTimeSeconds rolled back, don't add delta
@@ -284,11 +292,6 @@ gameTime
 	return vars.trackedTime;
 }
 
-isLoading
-{
-    return current.isLoading;
-}
-
 split
 {
 	if (current.Event != old.Event) {
@@ -300,6 +303,7 @@ split
 			}
 		}
 	}
+
 	//auto end
 	if (vars.EventString == "/Theater/Nest/Nest40/Theater/MV_Nest_BattleAdam_After_03.MV_Nest_BattleAdam_After_03") {
 		if (current.cutsceneFrameNum >= 3520 && current.cutsceneFrameNum <= 4424) { //cutsceneFrameNum can be read off from the previous cutscene, so check that we're not that far ahead first
@@ -309,19 +313,26 @@ split
 	}
 }
 
+reset
+{
+	return (current.Event != old.Event && current.Event == "/Theater/StarsDescent/Prologue/Theater/MV_Prologue_Main.MV_Prologue_Main");
+}
+
 start
 {
-	if (current.Event != old.Event && current.Event == "meDesign/Level/Theater/Matrix/MatrixXI/ME06/Theaters/MV_ME06_Tachy_Die_Theater.MV_ME06_Tachy_Die_Theater'")
-		return true; //for testing
-
-	if (settings["eventstring_start"]) //since our event_id thing isn't working reliably on everyone's system
-		return (current.Event != old.Event && current.Event == "/Theater/StarsDescent/Prologue/Theater/MV_Prologue_Main.MV_Prologue_Main");
+	if (current.Event != old.Event) { //for testing
+		if (current.Event == "/Theater/DrownedEidosDistrict/DED03/Theaters/MV_DED03_DropPod.MV_DED03_DropPod")
+			return true;
+		if (current.Event == "meDesign/Level/Theater/Matrix/MatrixXI/ME06/Theaters/MV_ME06_Tachy_Die_Theater.MV_ME06_Tachy_Die_Theater'")
+			return true;
+	}
 
 	// 47 to 48 -- press continue
 	// 53 to 54 -- new game or new game plus
 	// 49 to 50 -- ng or ng+ on some systems, unsure what the difference is
 	//return ((current.event_id == 54 || current.event_id == 50 || current.event_id == 53 || current.event_id== 47) && (old.event_id + 1) == current.event_id);
-	return (current.event_id == (old.event_id + 1) && current.event_id < 60 && current.event_id > 30);
+
+	return (current.Event != old.Event && current.Event == "/Theater/StarsDescent/Prologue/Theater/MV_Prologue_Main.MV_Prologue_Main");
 }
 
 update
