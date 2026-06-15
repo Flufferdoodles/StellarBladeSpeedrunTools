@@ -17,6 +17,8 @@ state("SB-Win64-Shipping", "1.4.1")
 	float TimeSeconds : 0x06FFA8F8, 0x748;
 	float UnpausedTimeSeconds : 0x06FFA8F8, 0x74C;
 	int cutsceneFrameNum : 0x07031700, 0x20, 0x0, 0x100;
+	//void *AnimationPlayer : 0x07031700, 0x20, 0x0, 0x60;
+	float OverrideSubtitleCoolTime : 0x07031700, 0x20, 0x0, 0x60, 0x648, 0x31C;
 }
 
 state("SB-Win64-Shipping", "1.4.0")
@@ -63,6 +65,8 @@ state("SB-Win64-Shipping", "1.1.0")
 	float TimeSeconds : 0x07038898, 0x748;
 	float UnpausedTimeSeconds : 0x07038898, 0x74C;
 	int cutsceneFrameNum : 0x07070FA8, 0x20, 0x0, 0x100;
+	//void *AnimationPlayer : 0x07070FA8, 0x20, 0x0, 0x60; //this isn't a real thing im just putting it here for safe keeping
+	float OverrideSubtitleCoolTime : 0x07070FA8, 0x20, 0x0, 0x60, 0x648, 0x31C;
 }
 
 init
@@ -73,18 +77,22 @@ init
 		default:
 			version = "unknown";
 			vars.timeScalePtr = null;
+			vars.subtitleCoolTimePtr = null;
 			break;
 		case 337035264: // 337035264 - ver 1.4.1
 			version = "1.4.1";
 			vars.timeScalePtr = new DeepPointer(0x06FFA8F8, 0x30, 0x268, 0x201C);
+			vars.subtitleCoolTimePtr = new DeepPointer(0x07031700, 0x20, 0x0, 0x60, 0x648, 0x31C);
 			break;
 		case 328835072: // 328835072 - ver 1.2.0
 			version = "1.2.0";
 			vars.timeScalePtr = null;
+			vars.subtitleCoolTimePtr = null;
 			break;
 		case 356278272: // 356278272 - ver 1.1.0
 			version = "1.1.0";
 			vars.timeScalePtr = new DeepPointer(0x07038898, 0x30, 0x268, 0x201C);
+			vars.subtitleCoolTimePtr = new DeepPointer(0x07070FA8, 0x20, 0x0, 0x60, 0x648, 0x31C);
 			break;
 	}
 
@@ -231,6 +239,7 @@ startup
 	vars.trackedTime = TimeSpan.Zero;
 	vars.EventString = null;
 	vars.inCutscene = false;
+	vars.inDialogueMasher = false;
 }
 
 onStart
@@ -350,9 +359,8 @@ update
 		print("dbgFilter: current.event_id: " + current.event_id + " old.event_id: " + old.event_id);
 	}
 
-	//print("current TimeSeconds: " + current.TimeSeconds.ToString());
 	if (current.cutsceneFrameNum != old.cutsceneFrameNum)
-		print("current cutscene framenumber: " + current.cutsceneFrameNum.ToString());
+		print("cutscene framenumber: " + current.cutsceneFrameNum.ToString() + " OverrideSubtitleCoolTime: " + current.OverrideSubtitleCoolTime.ToString());
 	// Alright so here's where we're at, we have a consistent pointer to the frame number of the cutscene that is currently playing,
 	// the problem is the frame numbers are relative to the individual "TheaterTrack" which is going to be camera cuts or many other things,
 	// So a cutscene may start at frame 0 and when it reaches its next track the frameNumber will get set to -700 or something
@@ -371,7 +379,8 @@ update
 		{
 			int frameNum = current.cutsceneFrameNum; //saves some typing
 
-			vars.inCutscene = true;			
+			vars.inCutscene = true; //this is probably doing nothing RN
+			vars.inDialogueMasher = false;
 			//can't put this in a switch? ok... lol
 			if (vars.EventString == "/Theater/DrownedEidosDistrict/DED01/Theaters/MV_DED01_Intro_Master.MV_DED01_Intro_Master") {
 				speed_startFrame = -1160;
@@ -379,7 +388,7 @@ update
 			}
 			//dialogue mashers are NOT working with this speedup method, we wind up losing a TON of time
 			//the delay before you can mash isn't time dilated, so need to investigate other ways around this
-			/*else if (vars.EventString == "/Theater/DrownedEidosDistrict/DED03/Theaters/MV_DED03_DropPod.MV_DED03_DropPod") {
+			else if (vars.EventString == "/Theater/DrownedEidosDistrict/DED03/Theaters/MV_DED03_DropPod.MV_DED03_DropPod") {
 				speed_startFrame = 5100;
 				speed_endFrame = 5720;
 				timeScaleDesired = 20.0f;
@@ -390,28 +399,35 @@ update
 				}
 			}
 			else if (vars.EventString == "MV_DED03_DropPod_Tetrapod_Scene") { //this is a dialogue masher
+				print("vars.EventString: " + vars.EventString);
 				speed_startFrame = -240;
-				speed_endFrame = 5920;
+				speed_endFrame = 5950;
 				timeScaleDesired = 6.0f;
 				vars.inDialogueMasher = true;
-				if (frameNum >= 5900) {
-					vars.EventString = "MV_DED03_DropPod_Tetrapod_Scene_Post_Cooperate"; //will need to check frame numbers for the other choice
+				if (frameNum >= 5925) {
+					vars.EventString = "MV_DED03_DropPod_Tetrapod_Scene_Post_Cooperate"; 
 					current.cutsceneFrameNumber = -1;
 					return;
 				}
 			}
-			else if (vars.EventString == "MV_DED03_DropPod_Tetrapod_Scene_Post_Cooperate") {
-				speed_startFrame = 10;
-				speed_endFrame = 1620;
+			/* //WEIRD DELAYS BREAK THESE
+			else if (vars.EventString == "MV_DED03_DropPod_Tetrapod_Scene_Post_Cooperate") { //speeding these up just breaks cuz we can't speed up the mashing..?
+				speed_startFrame = 60;
+				speed_endFrame = 1620; //bottom (slower) choice runs to frame 1822
 				timeScaleDesired = 6.0f;
 				vars.inDialogueMasher = true;
 				if (frameNum >= 1600) { //fuck this is not gonna work lol
-					vars.EventString = "MV_DED03_DropPod_Tetrapod_Scene_Post_Cooperate_2";
-					current.cutsceneFrameNumber = -1;
-					return;
+					if (frameNum < 5900)
+						vars.EventString = "MV_DED03_DropPod_Tetrapod_Scene_Post_Cooperate_2";
+					//current.cutsceneFrameNumber = -1;
+					//return;
 				}
 			}
 			else if (vars.EventString == "MV_DED03_DropPod_Tetrapod_Scene_Post_Cooperate_2") { //fuck you adam
+				if (frameNum >= 1600) {
+					current.cutsceneFrameNumber = -1;
+					return;
+				}
 				speed_startFrame = 10;
 				speed_endFrame = 600;
 				timeScaleDesired = 6.0f;
@@ -486,7 +502,7 @@ update
 			else if (vars.EventString == "/Theater/Xion/Xion01/Theater/MV_Xion01_Legacy2_Hologram.MV_Xion01_Legacy2_Hologram") {
 				speed_startFrame = -450;
 				speed_endFrame = 5900;
-				if (current.cutsceneFrameNum >= 5900) {
+				if (frameNum >= 5900) {
 					//hack, this is right before the black screen where we get the "skip" prompt, but it rewinds the frame number to -1290
 					//we don't want to continue fast forwarding here so we'll change the EventString instead
 					vars.EventString = null;
@@ -564,7 +580,13 @@ update
 			if (vars.timeScalePtr.DerefOffsets(game, out addr)) {
 				game.WriteValue<float>(addr, timeScaleOverride);
 			}
+			if (vars.subtitleCoolTimePtr.DerefOffsets(game, out addr)) {
+				float cooldownOverride = Math.Abs(1.5f / timeScaleOverride);
+				if (cooldownOverride != 1.5f)
+					game.WriteValue<float>(addr, cooldownOverride);
+			}
 		}
+
 
 		if (current.timeScale > 1.0f) print("current timeScale " + current.timeScale);
 		//a kind of debug assertion popup, using this to make sure we don't go any faster than 2.5f during gameplay
