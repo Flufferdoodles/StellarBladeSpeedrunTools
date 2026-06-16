@@ -18,7 +18,12 @@ state("SB-Win64-Shipping", "1.4.1")
 	float UnpausedTimeSeconds : 0x06FFA8F8, 0x74C;
 	int cutsceneFrameNum : 0x07031700, 0x20, 0x0, 0x100;
 	//void *AnimationPlayer : 0x07031700, 0x20, 0x0, 0x60;
-	float OverrideSubtitleCoolTime : 0x07031700, 0x20, 0x0, 0x60, 0x648, 0x31C;
+	int cutsceneStartFrame : 0x07031700, 0x20, 0x0, 0x60, 0x470;
+	int cutsceneDurationFrames : 0x07031700, 0x20, 0x0, 0x60, 0x474;
+	float cutscenePlayrate : 0x07031700, 0x20, 0x0, 0x60, 0x484; //maybe use this instead of timescale
+	float overrideSubtitleCoolTime : 0x07031700, 0x20, 0x0, 0x60, 0x648, 0x31C;
+	string256 cutsceneSequence : 0x07031700, 0x20, 0x0, 0x60, 0x730, 0x0;
+	string256 cutsceneSequence2 : 0x07031700, 0x20, 0x0, 0x60, 0x760, 0x0;
 }
 
 state("SB-Win64-Shipping", "1.4.0")
@@ -66,7 +71,12 @@ state("SB-Win64-Shipping", "1.1.0")
 	float UnpausedTimeSeconds : 0x07038898, 0x74C;
 	int cutsceneFrameNum : 0x07070FA8, 0x20, 0x0, 0x100;
 	//void *AnimationPlayer : 0x07070FA8, 0x20, 0x0, 0x60; //this isn't a real thing im just putting it here for safe keeping
-	float OverrideSubtitleCoolTime : 0x07070FA8, 0x20, 0x0, 0x60, 0x648, 0x31C;
+	int cutsceneStartFrame : 0x07070FA8, 0x20, 0x0, 0x60, 0x470; //signed integer
+	int cutsceneDurationFrames : 0x07070FA8, 0x20, 0x0, 0x60, 0x474; //signed integer
+	float cutscenePlayrate : 0x07070FA8, 0x20, 0x0, 0x60, 0x484; //maybe use this instead of timescale
+	float overrideSubtitleCoolTime : 0x07070FA8, 0x20, 0x0, 0x60, 0x648, 0x31C;
+	string256 cutsceneSequence : 0x07070FA8, 0x20, 0x0, 0x60, 0x730, 0x0;
+	string256 cutsceneSequence2 : 0x07070FA8, 0x20, 0x0, 0x60, 0x760, 0x0; //probably redundant?
 }
 
 init
@@ -359,8 +369,13 @@ update
 		print("dbgFilter: current.event_id: " + current.event_id + " old.event_id: " + old.event_id);
 	}
 
+	if (current.cutsceneSequence != null) {
+		//print("cutsceneID " + current.cutsceneSequence + " cutsceneStartFrame " + current.cutsceneStartFrame + " cutsceneDurationFrames " + current.cutsceneDurationFrames);
+		print("cutsceneID " + current.cutsceneSequence);
+	}
+
 	if (current.cutsceneFrameNum != old.cutsceneFrameNum)
-		print("cutscene framenumber: " + current.cutsceneFrameNum.ToString() + " OverrideSubtitleCoolTime: " + current.OverrideSubtitleCoolTime.ToString());
+		print("cutscene framenumber: " + current.cutsceneFrameNum.ToString() + " OverrideSubtitleCoolTime: " + current.overrideSubtitleCoolTime.ToString());
 	// Alright so here's where we're at, we have a consistent pointer to the frame number of the cutscene that is currently playing,
 	// the problem is the frame numbers are relative to the individual "TheaterTrack" which is going to be camera cuts or many other things,
 	// So a cutscene may start at frame 0 and when it reaches its next track the frameNumber will get set to -700 or something
