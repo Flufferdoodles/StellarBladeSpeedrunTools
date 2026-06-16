@@ -18,12 +18,12 @@ state("SB-Win64-Shipping", "1.4.1")
 	float UnpausedTimeSeconds : 0x06FFA8F8, 0x74C;
 	int cutsceneFrameNum : 0x07031700, 0x20, 0x0, 0x100;
 	//void *AnimationPlayer : 0x07031700, 0x20, 0x0, 0x60;
-	int cutsceneStartFrame : 0x07031700, 0x20, 0x0, 0x60, 0x470;
-	int cutsceneDurationFrames : 0x07031700, 0x20, 0x0, 0x60, 0x474;
+	//int cutsceneStartFrame : 0x07031700, 0x20, 0x0, 0x60, 0x470;
+	//int cutsceneDurationFrames : 0x07031700, 0x20, 0x0, 0x60, 0x474;
 	float cutscenePlayrate : 0x07031700, 0x20, 0x0, 0x60, 0x484; //maybe use this instead of timescale
 	float overrideSubtitleCoolTime : 0x07031700, 0x20, 0x0, 0x60, 0x648, 0x31C;
 	string256 cutsceneSequence : 0x07031700, 0x20, 0x0, 0x60, 0x730, 0x0;
-	string256 cutsceneSequence2 : 0x07031700, 0x20, 0x0, 0x60, 0x760, 0x0;
+	//string256 cutsceneSequence2 : 0x07031700, 0x20, 0x0, 0x60, 0x760, 0x0; //probably redundant?
 }
 
 state("SB-Win64-Shipping", "1.4.0")
@@ -71,12 +71,12 @@ state("SB-Win64-Shipping", "1.1.0")
 	float UnpausedTimeSeconds : 0x07038898, 0x74C;
 	int cutsceneFrameNum : 0x07070FA8, 0x20, 0x0, 0x100;
 	//void *AnimationPlayer : 0x07070FA8, 0x20, 0x0, 0x60; //this isn't a real thing im just putting it here for safe keeping
-	int cutsceneStartFrame : 0x07070FA8, 0x20, 0x0, 0x60, 0x470; //signed integer
-	int cutsceneDurationFrames : 0x07070FA8, 0x20, 0x0, 0x60, 0x474; //signed integer
+	//int cutsceneStartFrame : 0x07070FA8, 0x20, 0x0, 0x60, 0x470; //signed integer
+	//int cutsceneDurationFrames : 0x07070FA8, 0x20, 0x0, 0x60, 0x474; //signed integer
 	float cutscenePlayrate : 0x07070FA8, 0x20, 0x0, 0x60, 0x484; //maybe use this instead of timescale
 	float overrideSubtitleCoolTime : 0x07070FA8, 0x20, 0x0, 0x60, 0x648, 0x31C;
 	string256 cutsceneSequence : 0x07070FA8, 0x20, 0x0, 0x60, 0x730, 0x0;
-	string256 cutsceneSequence2 : 0x07070FA8, 0x20, 0x0, 0x60, 0x760, 0x0; //probably redundant?
+	//string256 cutsceneSequence2 : 0x07070FA8, 0x20, 0x0, 0x60, 0x760, 0x0; //probably redundant...
 }
 
 init
@@ -303,9 +303,6 @@ gameTime
 		return vars.trackedTime;
 	}
 
-	//vars.trackedTime.Add(TimeSpan.FromSeconds(delta));
-	//print(timer.CurrentTime.GameTime.ToString());
-	//return TimeSpan.FromSeconds(vars.trackedTime);
 	vars.trackedTime = TimeSpan.FromSeconds(vars.trackedTime.TotalSeconds + delta); //why does this work but not vars.trackedTime.Add LMFAO??
 	print(vars.trackedTime.ToString());
 	return vars.trackedTime;
@@ -360,31 +357,26 @@ start
 update
 {
 	//debug
- 	if (current.Event != old.Event && current.Event != null)
-	{
+ 	if (current.Event != old.Event && current.Event != null) {
 		print("dbgFilter: current.Event: \"" + current.Event + "\",");
 		vars.EventString = current.Event; //track this here since it gets 0'd out on next update
-		current.cutsceneFrameNum = -1; //reset this because the value in this update is sometimes from the previous sequence
 	}
 
 	if (current.event_id == (old.event_id + 1) && current.event_id < 60 && current.event_id > 30)
-	{
 		print("dbgFilter: current.event_id: " + current.event_id + " old.event_id: " + old.event_id);
-	}
 
 	//if (current.cutsceneSequence != old.cutsceneSequence && current.cutsceneSequence != null)
-		//print("cutsceneID " + current.cutsceneSequence);
 		//print("cutsceneID " + current.cutsceneSequence + " cutsceneStartFrame " + current.cutsceneStartFrame + " cutsceneDurationFrames " + current.cutsceneDurationFrames);
 
 	//if (current.cutsceneFrameNum != old.cutsceneFrameNum)
 	if ((current.cutsceneSequence != null && current.cutsceneSequence != old.cutsceneSequence) || current.cutsceneFrameNum != old.cutsceneFrameNum)
 		print("framenumber: " + current.cutsceneFrameNum.ToString() + " cutscene: " + current.cutsceneSequence);
 
-	// Alright so here's where we're at, we have a consistent pointer to the frame number of the cutscene that is currently playing,
-	// the problem is the frame numbers are relative to the individual "TheaterTrack" which is going to be camera cuts or many other things,
-	// So a cutscene may start at frame 0 and when it reaches its next track the frameNumber will get set to -700 or something
-	// LevelSequencePlayers seem to just run through an array of TheaterTracks
-	// If we want to remove all of these conditional hacks below we need to locate a pointer to something representing the current TheaterTracs
+	//Need to test each sequence and make sure the timing hasn't deviated too much from the old LRT before adding more
+	//How this works is we check the ID of the currently playing animationSequence and define a range of frames that
+	//we speed up by, currently we're setting the global timeDilation property, but we can probably just speed up the actual sequenceplayer instead
+	//I have plugged in a few dialogue mashing sections, these work the same way, but we also write to another field that overrides the
+	//cooldown at which we can skip dialogue via the A button, we do this by a factor of the timescale.  These I am most worried about deviating.
 	if (settings["cutscene_speedup"] && vars.timeScalePtr != null && current.cutsceneSequence != null)
 	{
 		float timeScaleOverride = -1.0f;
@@ -392,9 +384,9 @@ update
 		int speed_startFrame = -1;
 		int speed_endFrame = -1;
 
-		//print("vars.EventString: " + vars.EventString);
-		if (//current.cutsceneFrameNum != -1 &&
-				current.cutsceneFrameNum > old.cutsceneFrameNum) //do this while the cutsceneFrameNum is being incremented
+		//if (vars.EventString != null) print("vars.EventString: " + vars.EventString);
+		if (current.cutsceneSequence != null && //this is probably the only condition we need now
+			current.cutsceneFrameNum > old.cutsceneFrameNum) //do this while the cutsceneFrameNum is being incremented
 		{
 			int frameNum = current.cutsceneFrameNum; //saves some typing
 
@@ -576,7 +568,7 @@ update
 				speed_startFrame = -260;
 				speed_endFrame = 6767;
 			}
-			else if (current.cutsceneSequence == "MV_Nest_RavenBattle_After_Master") { //FIXME???
+			else if (current.cutsceneSequence == "MV_Nest_RavenBattle_After_Master") {
 				//raven finisher
 				speed_startFrame = 1000;
 				speed_endFrame = 12400;
@@ -588,15 +580,12 @@ update
 		}
 		else if (current.cutsceneFrameNum == old.cutsceneFrameNum) { //idk idk idk
 			vars.inCutscene = false;
-			//vars.EventString = null;
 		}
 
 		if (vars.inCutscene) {
 				if (speed_endFrame != -1 && current.cutsceneFrameNum >= speed_endFrame) {
 					print("STOP!!!!!");
 					timeScaleOverride = 1.0f;
-					vars.EventString = null; //maybe we just want to do this here? testme..
-					//nah this breaks ones that start with a positive framenumber FUCK!!!!!!
 				}
 				else if (speed_startFrame != -1 && current.cutsceneFrameNum >= speed_startFrame) {
 					print("fast fwd");
