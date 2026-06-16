@@ -369,19 +369,20 @@ update
 		print("dbgFilter: current.event_id: " + current.event_id + " old.event_id: " + old.event_id);
 	}
 
-	if (current.cutsceneSequence != null) {
+	//if (current.cutsceneSequence != old.cutsceneSequence && current.cutsceneSequence != null)
+		//print("cutsceneID " + current.cutsceneSequence);
 		//print("cutsceneID " + current.cutsceneSequence + " cutsceneStartFrame " + current.cutsceneStartFrame + " cutsceneDurationFrames " + current.cutsceneDurationFrames);
-		print("cutsceneID " + current.cutsceneSequence);
-	}
 
-	if (current.cutsceneFrameNum != old.cutsceneFrameNum)
-		print("cutscene framenumber: " + current.cutsceneFrameNum.ToString() + " OverrideSubtitleCoolTime: " + current.overrideSubtitleCoolTime.ToString());
+	//if (current.cutsceneFrameNum != old.cutsceneFrameNum)
+	if ((current.cutsceneSequence != null && current.cutsceneSequence != old.cutsceneSequence) || current.cutsceneFrameNum != old.cutsceneFrameNum)
+		print("framenumber: " + current.cutsceneFrameNum.ToString() + " cutscene: " + current.cutsceneSequence);
+
 	// Alright so here's where we're at, we have a consistent pointer to the frame number of the cutscene that is currently playing,
 	// the problem is the frame numbers are relative to the individual "TheaterTrack" which is going to be camera cuts or many other things,
 	// So a cutscene may start at frame 0 and when it reaches its next track the frameNumber will get set to -700 or something
 	// LevelSequencePlayers seem to just run through an array of TheaterTracks
 	// If we want to remove all of these conditional hacks below we need to locate a pointer to something representing the current TheaterTracs
-	if (settings["cutscene_speedup"] && vars.timeScalePtr != null && vars.EventString != null)
+	if (settings["cutscene_speedup"] && vars.timeScalePtr != null && current.cutsceneSequence != null)
 	{
 		float timeScaleOverride = -1.0f;
 		float timeScaleDesired = 67.67f; //override the speedup rate depending on the scene
@@ -389,7 +390,7 @@ update
 		int speed_endFrame = -1;
 
 		//print("vars.EventString: " + vars.EventString);
-		if (current.cutsceneFrameNum != -1 &&
+		if (//current.cutsceneFrameNum != -1 &&
 				current.cutsceneFrameNum > old.cutsceneFrameNum) //do this while the cutsceneFrameNum is being incremented
 		{
 			int frameNum = current.cutsceneFrameNum; //saves some typing
@@ -397,169 +398,185 @@ update
 			vars.inCutscene = true; //this is probably doing nothing RN
 			vars.inDialogueMasher = false;
 			//can't put this in a switch? ok... lol
-			if (vars.EventString == "/Theater/DrownedEidosDistrict/DED01/Theaters/MV_DED01_Intro_Master.MV_DED01_Intro_Master") {
+			if (current.cutsceneSequence == "MV_DED01_Intro_Master") {
 				speed_startFrame = -1160;
 				speed_endFrame = -300;
 			}
 			//dialogue mashers are NOT working with this speedup method, we wind up losing a TON of time
 			//the delay before you can mash isn't time dilated, so need to investigate other ways around this
-			else if (vars.EventString == "/Theater/DrownedEidosDistrict/DED03/Theaters/MV_DED03_DropPod.MV_DED03_DropPod") {
+			else if (current.cutsceneSequence == "MV_DED03_DropPod") {
 				speed_startFrame = 5100;
 				speed_endFrame = 5720;
 				timeScaleDesired = 20.0f;
-				if (frameNum >= 5700) {
-					vars.EventString = "MV_DED03_DropPod_Tetrapod_Scene"; //hack
-					current.cutsceneFrameNumber = -1;
-					return;
-				}
 			}
-			else if (vars.EventString == "MV_DED03_DropPod_Tetrapod_Scene") { //this is a dialogue masher
-				print("vars.EventString: " + vars.EventString);
+			else if (current.cutsceneSequence == "Dialogue_POD_ToXion1st") { //this is a dialogue masher
 				speed_startFrame = -240;
 				speed_endFrame = 5950;
 				timeScaleDesired = 6.0f;
 				vars.inDialogueMasher = true;
-				if (frameNum >= 5925) {
-					vars.EventString = "MV_DED03_DropPod_Tetrapod_Scene_Post_Cooperate"; 
-					current.cutsceneFrameNumber = -1;
-					return;
-				}
 			}
 			/* //WEIRD DELAYS BREAK THESE
-			else if (vars.EventString == "MV_DED03_DropPod_Tetrapod_Scene_Post_Cooperate") { //speeding these up just breaks cuz we can't speed up the mashing..?
+			else if (current.cutsceneSequence == "TS_POD_ToXion_SelectionA") {
 				speed_startFrame = 60;
 				speed_endFrame = 1620; //bottom (slower) choice runs to frame 1822
 				timeScaleDesired = 6.0f;
 				vars.inDialogueMasher = true;
-				if (frameNum >= 1600) { //fuck this is not gonna work lol
-					if (frameNum < 5900)
-						vars.EventString = "MV_DED03_DropPod_Tetrapod_Scene_Post_Cooperate_2";
-					//current.cutsceneFrameNumber = -1;
-					//return;
-				}
 			}
-			else if (vars.EventString == "MV_DED03_DropPod_Tetrapod_Scene_Post_Cooperate_2") { //fuck you adam
-				if (frameNum >= 1600) {
-					current.cutsceneFrameNumber = -1;
-					return;
-				}
+			else if (current.cutsceneSequence == "TS_POD_ToXion_SelectionB") {
+				speed_startFrame = 30;
+				speed_endFrame = 1820; //bottom (slower) choice runs to frame 1822
+				timeScaleDesired = 6.0f;
+				vars.inDialogueMasher = true;
+			}
+			else if (current.cutsceneSequence == "TS_POD_ToXion_End") { //fuck you adam
 				speed_startFrame = 10;
 				speed_endFrame = 600;
 				timeScaleDesired = 6.0f;
 				vars.inDialogueMasher = true;
 			}*/
-			else if (vars.EventString == "/Theater/Xion/Xion05/Theater/MV_Xion05_InsideLift_GoingDown_Enter_Main1.MV_Xion05_InsideLift_GoingDown_Enter_Main1") {
+			else if (current.cutsceneSequence == "MV_Xion05_InsideLift_GoingDown_Enter_Main1") {
 				//going down xion elevator
 				speed_startFrame = 10;
 				speed_endFrame = 450;
 				timeScaleDesired = 10.0f;
 			}
-			else if (vars.EventString == "/Theater/Xion/Xion05/Theater/MV_Xion05_InsideLift_GoingDown_Leave_Main2.MV_Xion05_InsideLift_GoingDown_Leave_Main2") {
+			else if (current.cutsceneSequence == "MV_Xion05_InsideLift_GoingDown_Leave_Main2") {
 				//getting off xion elevator (alone)
 				speed_startFrame = -225;
 				speed_endFrame = 250;
 				timeScaleDesired = 10.0f;
 			}
-			else if (vars.EventString == "/Theater/Xion/Xion05/Theater/MV_Xion05_InsideLift_GoingUp_Leave_WithAdamLily_Main2.MV_Xion05_InsideLift_GoingUp_Leave_WithAdamLily_Main2") {
+			else if (current.cutsceneSequence == "MV_Xion05_InsideLift_GoingUp_Leave_WithAdamLily_Main2") {
 				//riding up lift in xion 1 (removeme?)
 				speed_startFrame = -240;
 				speed_endFrame = 140;
 				timeScaleDesired = 10.0f;
 			}
-			else if (vars.EventString == "/Theater/Xion/Xion07/Theater/Dialogue/Dialogue_Xion07_Phase1_HyperDriveRoomEnter_Theater.Dialogue_Xion07_Phase1_HyperDriveRoomEnter_Theater") {
+			/*else if (current.cutsceneSequence == "Subtitle_Xion06_P1_SmallTalk_Rael_02") { //has a weird mash delay, fix this later?
+				vars.inDialogueMasher = true;
+				speed_startFrame = 10;
+				speed_endFrame = 820;
+				timeScaleDesired = 4.0f;
+			}*/
+			else if (current.cutsceneSequence == "Dialogue_Xion07_Phase1_HyperDriveRoomEnter") {
 				//first long unskippable bit into mashable hypercell cutscene
 				speed_startFrame = -1030;
 				speed_endFrame = -20;
+				//runs as a dialogue masher up to frame 1529, could lower the speeduprate from -20 to 1450
 				timeScaleDesired = 20.0f;
 			}
-			else if (vars.EventString == "/Theater/Xion/Xion01/Theater/Dialogue/Dialogue_Xion01_Phase1_SmallTalk_Street2_Theater.Dialogue_Xion01_Phase1_SmallTalk_Street2_Theater") {
-				//left orcal's chamber, long establishing shot
-				//it starts from 0 and increments to ~120 when first entering, then starts at -690 after fadeout
-				//this one may need TLC hacks
-				speed_startFrame = -680;
-				//speed_endFrame = -150;
-				if (frameNum < -50)
-					speed_endFrame = -75;
+			else if (current.cutsceneSequence == "Dialogue_Xion06_Phase2_ElderInteraction") {
+				speed_startFrame = -60;
+				speed_endFrame = 5325;
+				timeScaleDesired = 4.0f;
+				vars.inDialogueMasher = true;
+			}
+			else if (current.cutsceneSequence == "MV_Xion01_SmallTalkAfterChamber_Trnasit") { //outside xion after orcal chamber
+				speed_startFrame = 6;
+				speed_endFrame = 110;
 				timeScaleDesired = 10.0f;
 			}
-			else if (vars.EventString == "/Theater/Xion/Xion01/Theater/MV_Xion01_DroneUpgrade_Theater.MV_Xion01_DroneUpgrade_Theater") {
+			else if (current.cutsceneSequence == "Dialogue_Xion01_Phase1_SmallTalk_Street2") {
+				//left orcal's chamber, long establishing shot
+				speed_startFrame = -680;
+				speed_endFrame = -75;
+				timeScaleDesired = 10.0f;
+				//runs as dialogue masher to frame 3260, could speed it up by 4x until 3200
+			}
+			else if (current.cutsceneSequence == "Dialogue_Xion01_Phase2_SmallTalk_Street3") { //sister's junk TEST & TIME THIS!!!!!!!!
+				speed_startFrame = 10;
+				speed_endFrame = 6967;
+				timeScaleDesired = 4.0f;
+				vars.inDialogueMasher = true;
+			}
+			else if (current.cutsceneSequence == "MV_Xion01_DroneUpgrade_Main") {
 				//IT'S AN EVOLUTION!!!
 				speed_startFrame = 2472;
 				speed_endFrame = 3072;
 				timeScaleDesired = 10.0f;
 			}
-			else if (vars.EventString == "/Theater/Xion/Xion01/Theater/Dialogue/Dialogue_Xion01_Phase2_Agit_WithAdam_Theater.Dialogue_Xion01_Phase2_Agit_WithAdam_Theater") {
+			else if (current.cutsceneSequence == "Dialogue_Xion01_Phase1_DroneUpgrade") { //TIME THIS SHIT!!!!!!!!!!!!
+				speed_startFrame = -50;
+				speed_endFrame = 1150;
+				timeScaleDesired = 4.0f;
+				vars.inDialogueMasher = true;
+			}
+			else if (current.cutsceneSequence == "Dialogue_Xion01_Phase2_Agit_WithAdam") { //dialogue mashing starts at around ~120
 				//"the wasteland is that way.."
 				speed_startFrame = 4200;
 				speed_endFrame = 4950;
 				timeScaleDesired = 10.0f;
 			}
-			else if (vars.EventString == "/Theater/Xion/Xion01/Theater/Dialogue/Dialogue_Xion01_Phase3_SmallTalkAfterChamber_Theater.Dialogue_Xion01_Phase3_SmallTalkAfterChamber_Theater") {
+			else if (current.cutsceneSequence == "Dialogue_Xion01_Phase3_SmallTalkAfterChamber") {
 				//xion 2 cutscene after orcal/hypercell chamber (we skip this in any%)
 				speed_startFrame = 120; //would be nicer to start this earlier but it has the same issue where positive framecount for fade out and then the actual scene starts at -120
 				speed_endFrame = 1750;
 			}
-			else if (vars.EventString == "meDesign/Level/Theater/Matrix/MatrixXI/ME06/Theaters/MV_ME06_Tachy_Die_Theater.MV_ME06_Tachy_Die_Theater'") {
+			else if (current.cutsceneSequence == "MV_ME06_Tachy_Die_Master") {
 				//tachy finisher
 				speed_startFrame = 650; //start after KILLER animation
 				speed_endFrame = 8500; //stop just before we fade out?
 			}
-			else if (vars.EventString == "/Theater/Xion/Xion01/Theater/MV_Xion01_AfterMatrix_Theater.MV_Xion01_AfterMatrix_Theater") { //xion fadein after tachy
+			else if (current.cutsceneSequence == "MV_Xion01_AfterMatrix") { //xion fadein after tachy
 				speed_startFrame = 10; //start after fadein?
 				speed_endFrame = 500; //stop before fadeout?
 			}
-			else if (vars.EventString == "/Theater/Xion/Xion06/Theater/Dialogue/Dialogue_Xion06_Phase3_AfterMatrix_TalkAfterLanding_Theater.Dialogue_Xion06_Phase3_AfterMatrix_TalkAfterLanding_Theater") {
+			else if (current.cutsceneSequence == "Dialogue_Xion06_Phase3_AfterMatrix_TalkAfterLanding") {
 				//skip long establishing shot in orcal's chamber
 				speed_startFrame = -750;
-				speed_endFrame = -150;
+				speed_endFrame = -250;
 				timeScaleDesired = 10.0f;
+				//continues being a dialogue masher until frame 6680, stop at 6650?
 			}
-			else if (vars.EventString == "/Theater/Xion/Xion01/Theater/MV_Xion01_Legacy2_Hologram.MV_Xion01_Legacy2_Hologram") {
+			else if (current.cutsceneSequence == "Dialogue_Xion01_Phase3_AfterMatrix_AgitEnter") {
+				speed_startFrame = 30;
+				speed_endFrame = 1000;
+				timeScaleDesired = 4.0f;
+				vars.inDialogueMasher = true;
+			}
+			else if (current.cutsceneSequence == "MV_Xion01_Legacy2_Hologram") {
 				speed_startFrame = -450;
 				speed_endFrame = 5900;
-				if (frameNum >= 5900) {
-					//hack, this is right before the black screen where we get the "skip" prompt, but it rewinds the frame number to -1290
-					//we don't want to continue fast forwarding here so we'll change the EventString instead
-					vars.EventString = null;
-					speed_endFrame = 4750;
-				}
 			}
-			else if (vars.EventString == "/Theater/AbyssLabor/AYL03/Theater/MV_AYL03_Legacy3_Hologram_Theater.MV_AYL03_Legacy3_Hologram_Theater") {
-				//legacy after maelstrom kill in abyss levoire
-				//speed_startFrame = 1100;
-				//speed_endFrame = 5500;
-				//ok we're gonna hack the fuck out of this
-				if (frameNum >= 1370)
-					vars.EventString = "MV_AYL03_Legacy3_Hologram_Theater.MV_AYL03_Legacy3_Hologram_Theater_HACK"; //we will check our frame range here
+			else if (current.cutsceneSequence == "TS_Xion01_Adam_P4_TalkAdam_Q") {
+				speed_startFrame = -50;
+				speed_endFrame = 287;
+				timeScaleDesired = 4.0f;
 			}
-			else if (vars.EventString == "MV_AYL03_Legacy3_Hologram_Theater.MV_AYL03_Legacy3_Hologram_Theater_HACK") {
-				//this is when we actually start the legacy section (different track, we hacked the string in the block above)
+			else if (current.cutsceneSequence == "MV_AYL03_Legacy3_Hologram") {
+				//this is when we actually start the legacy section
 				speed_startFrame = -25;
 				speed_endFrame = 5500;
 			}
-			else if (vars.EventString == "/Theater/Xion/Xion01/Theater/MV_Xion01_PODAfterAYLLanding_Theater.MV_Xion01_PODAfterAYLLanding_Theater") {
+			else if (current.cutsceneSequence == "MV_Xion01_PODAfterAYLLanding_Main") {
 				//landing after abyss
 				speed_startFrame = 630;
 				speed_endFrame = 1050;
 			}
-			else if (vars.EventString == "/Theater/SpaceElevator/SE10/Theater/MV_SE10_AlphaNative_Ending_Master.MV_SE10_AlphaNative_Ending_Master") {
+			else if (current.cutsceneSequence == "MV_SE10_AlphaNative_QTE_Master") {
 				//democrawler into demogorgon
-				speed_startFrame = 3200;
+				speed_startFrame = 2400;
 				speed_endFrame = 5250;
 			}
-			else if (vars.EventString == "/Theater/Xion/Xion01/Theater/Dialogue/Dialogue_Xion01_Phase5_PodAgitLanding_Theater.Dialogue_Xion01_Phase5_PodAgitLanding_Theater") {
+			else if (current.cutsceneSequence == "Dialogue_WLA10_POD_Inside") {
+				speed_startFrame = 10;
+				speed_endFrame = 1337;
+				timeScaleDesired = 4.0f;
+				vars.inDialogueMasher = true;
+			}
+			else if (current.cutsceneSequence == "Dialogue_Xion01_P5_PodAgitLanding") {
 				speed_startFrame = 20;
 				speed_endFrame = 1750;
 			}
-			else if (vars.EventString == "/Theater/Xion/Xion07/Theater/Dialogue/Dialogue_Xion07_Phase5_DyingElder_Theater.Dialogue_Xion07_Phase5_DyingElder_Theater") {
+			else if (current.cutsceneSequence == "Dialogue_Xion07_Phase5_DyingElder") {
 				//orcal deadge sadge
 				speed_startFrame = -260;
 				speed_endFrame = 6767;
 			}
-			else if (vars.EventString == "/Theater/WasteLandA/WLA10/Theater/MV_WLA_Nest_RavenBattle_QTE_Master.MV_WLA_Nest_RavenBattle_QTE_Master") {
+			else if (current.cutsceneSequence == "MV_Nest_RavenBattle_After_Master") { //FIXME???
 				//raven finisher
 				speed_startFrame = 1000;
-				speed_endFrame = 12300;
+				speed_endFrame = 12400;
 			}
 			else {
 				speed_startFrame = -1;
@@ -597,7 +614,9 @@ update
 			}
 			if (vars.subtitleCoolTimePtr.DerefOffsets(game, out addr)) {
 				float cooldownOverride = Math.Abs(1.5f / timeScaleOverride);
-				if (cooldownOverride != 1.5f)
+				if (cooldownOverride == 1.5f)
+					cooldownOverride = 0.0f;
+				if (cooldownOverride != current.overrideSubtitleCoolTime)
 					game.WriteValue<float>(addr, cooldownOverride);
 			}
 		}
