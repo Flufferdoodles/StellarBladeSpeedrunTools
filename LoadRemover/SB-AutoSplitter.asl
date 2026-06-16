@@ -324,17 +324,14 @@ split
 	}
 
 	//auto end
-	if (vars.EventString == "/Theater/Nest/Nest40/Theater/MV_Nest_BattleAdam_After_03.MV_Nest_BattleAdam_After_03") {
-		if (current.cutsceneFrameNum >= 3520 && current.cutsceneFrameNum <= 4424) { //cutsceneFrameNum can be read off from the previous cutscene, so check that we're not that far ahead first
-			vars.EventString = null;
-			return true;
-		}
+	if (current.cutsceneSequence == "MV_Nest_BattleAdam_After_03") {
+		return (current.cutsceneFrameNum >= 3520);
 	}
 }
 
 reset
 {
-	return (current.Event != old.Event && current.Event == "/Theater/StarsDescent/Prologue/Theater/MV_Prologue_Main.MV_Prologue_Main");
+	return (current.cutsceneSequence != old.cutsceneSequence && current.cutsceneSequence == "MV_Prologue_Main");
 }
 
 start
@@ -351,7 +348,7 @@ start
 	// 49 to 50 -- ng or ng+ on some systems, unsure what the difference is
 	//return ((current.event_id == 54 || current.event_id == 50 || current.event_id == 53 || current.event_id== 47) && (old.event_id + 1) == current.event_id);
 
-	return (current.Event != old.Event && current.Event == "/Theater/StarsDescent/Prologue/Theater/MV_Prologue_Main.MV_Prologue_Main");
+	return (current.cutsceneSequence != old.cutsceneSequence && current.cutsceneSequence == "MV_Prologue_Main");
 }
 
 update
