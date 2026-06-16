@@ -274,7 +274,7 @@ isLoading
 }
 
 gameTime
-{	
+{
 	if (timer.IsGameTimePaused || current.isLoading) { //don't tick timer on the loading screen at all
 		vars.trackedTime = timer.CurrentTime.GameTime;
 		return vars.trackedTime;
@@ -320,15 +320,15 @@ split
 		}
 	}
 
-	//auto end
-	if (current.cutsceneSequence == "MV_Nest_LilyEnding_Credits_Save") { //"true" ending
-		return (current.cutsceneFrameNum >= 370);
-	}
-	if (current.cutsceneSequence == "MV_Nest_BattleAdam_After_03") { //"bad" ending
-		return (current.cutsceneFrameNum >= 3520);
-	}
-	if (current.cutsceneSequence == "MV_Nest_LilyEnding_Credits_Die") { //"worst" ending
-		return (current.cutsceneFrameNum >= 175);
+	//auto end, split on credits
+	switch ((string)current.cutsceneSequence)
+	{
+		case "MV_Nest_LilyEnding_Credits_Save": //"true" ending
+			return (current.cutsceneFrameNum >= 370);
+		case "MV_Nest_BattleAdam_After_03": //"bad" ending
+			return (current.cutsceneFrameNum >= 3520);
+		case "MV_Nest_LilyEnding_Credits_Die": //"worst" ending
+			return (current.cutsceneFrameNum >= 175);
 	}
 }
 
@@ -392,190 +392,193 @@ update
 
 			vars.inCutscene = true; //this is probably doing nothing RN
 			vars.inDialogueMasher = false;
-			//can't put this in a switch? ok... lol
-			if (current.cutsceneSequence == "MV_DED01_Intro_Master") {
-				speed_startFrame = -1160;
-				speed_endFrame = -300;
-			}
-			//dialogue mashers are NOT working with this speedup method, we wind up losing a TON of time
-			//the delay before you can mash isn't time dilated, so need to investigate other ways around this
-			else if (current.cutsceneSequence == "MV_DED03_DropPod") {
-				speed_startFrame = 5100;
-				speed_endFrame = 5720;
-				timeScaleDesired = 20.0f;
-			}
-			else if (current.cutsceneSequence == "Dialogue_POD_ToXion1st") { //this is a dialogue masher
-				speed_startFrame = -240;
-				speed_endFrame = 5950;
-				timeScaleDesired = 6.0f;
-				vars.inDialogueMasher = true;
-			}
-			/* //WEIRD DELAYS BREAK THESE
-			else if (current.cutsceneSequence == "TS_POD_ToXion_SelectionA") {
-				speed_startFrame = 60;
-				speed_endFrame = 1620; //bottom (slower) choice runs to frame 1822
-				timeScaleDesired = 6.0f;
-				vars.inDialogueMasher = true;
-			}
-			else if (current.cutsceneSequence == "TS_POD_ToXion_SelectionB") {
-				speed_startFrame = 30;
-				speed_endFrame = 1820; //bottom (slower) choice runs to frame 1822
-				timeScaleDesired = 6.0f;
-				vars.inDialogueMasher = true;
-			}
-			else if (current.cutsceneSequence == "TS_POD_ToXion_End") { //fuck you adam
-				speed_startFrame = 10;
-				speed_endFrame = 600;
-				timeScaleDesired = 6.0f;
-				vars.inDialogueMasher = true;
-			}*/
-			else if (current.cutsceneSequence == "MV_Xion05_InsideLift_GoingDown_Enter_Main1") {
-				//going down xion elevator
-				speed_startFrame = 10;
-				speed_endFrame = 450;
-				timeScaleDesired = 10.0f;
-			}
-			else if (current.cutsceneSequence == "MV_Xion05_InsideLift_GoingDown_Leave_Main2") {
-				//getting off xion elevator (alone)
-				speed_startFrame = -225;
-				speed_endFrame = 250;
-				timeScaleDesired = 10.0f;
-			}
-			else if (current.cutsceneSequence == "MV_Xion05_InsideLift_GoingUp_Leave_WithAdamLily_Main2") {
-				//riding up lift in xion 1 (removeme?)
-				speed_startFrame = -240;
-				speed_endFrame = 140;
-				timeScaleDesired = 10.0f;
-			}
-			/*else if (current.cutsceneSequence == "Subtitle_Xion06_P1_SmallTalk_Rael_02") { //has a weird mash delay, fix this later?
-				vars.inDialogueMasher = true;
-				speed_startFrame = 10;
-				speed_endFrame = 820;
-				timeScaleDesired = 4.0f;
-			}*/
-			else if (current.cutsceneSequence == "Dialogue_Xion07_Phase1_HyperDriveRoomEnter") {
-				//first long unskippable bit into mashable hypercell cutscene
-				speed_startFrame = -1030;
-				speed_endFrame = -20;
-				//runs as a dialogue masher up to frame 1529, could lower the speeduprate from -20 to 1450
-				timeScaleDesired = 20.0f;
-			}
-			else if (current.cutsceneSequence == "Dialogue_Xion06_Phase2_ElderInteraction") {
-				speed_startFrame = -60;
-				speed_endFrame = 5325;
-				timeScaleDesired = 4.0f;
-				vars.inDialogueMasher = true;
-			}
-			else if (current.cutsceneSequence == "MV_Xion01_SmallTalkAfterChamber_Trnasit") { //outside xion after orcal chamber
-				speed_startFrame = 6;
-				speed_endFrame = 110;
-				timeScaleDesired = 10.0f;
-			}
-			else if (current.cutsceneSequence == "Dialogue_Xion01_Phase1_SmallTalk_Street2") {
-				//left orcal's chamber, long establishing shot
-				speed_startFrame = -680;
-				speed_endFrame = -75;
-				timeScaleDesired = 10.0f;
-				//runs as dialogue masher to frame 3260, could speed it up by 4x until 3200
-			}
-			else if (current.cutsceneSequence == "Dialogue_Xion01_Phase2_SmallTalk_Street3") { //sister's junk TEST & TIME THIS!!!!!!!!
-				speed_startFrame = 10;
-				speed_endFrame = 6967;
-				timeScaleDesired = 4.0f;
-				vars.inDialogueMasher = true;
-			}
-			else if (current.cutsceneSequence == "MV_Xion01_DroneUpgrade_Main") {
-				//IT'S AN EVOLUTION!!!
-				speed_startFrame = 2472;
-				speed_endFrame = 3072;
-				timeScaleDesired = 10.0f;
-			}
-			else if (current.cutsceneSequence == "Dialogue_Xion01_Phase1_DroneUpgrade") { //TIME THIS SHIT!!!!!!!!!!!!
-				speed_startFrame = -50;
-				speed_endFrame = 1150;
-				timeScaleDesired = 4.0f;
-				vars.inDialogueMasher = true;
-			}
-			else if (current.cutsceneSequence == "Dialogue_Xion01_Phase2_Agit_WithAdam") { //dialogue mashing starts at around ~120
-				//"the wasteland is that way.."
-				speed_startFrame = 4200;
-				speed_endFrame = 4950;
-				timeScaleDesired = 10.0f;
-			}
-			else if (current.cutsceneSequence == "Dialogue_Xion01_Phase3_SmallTalkAfterChamber") {
-				//xion 2 cutscene after orcal/hypercell chamber (we skip this in any%)
-				speed_startFrame = 120; //would be nicer to start this earlier but it has the same issue where positive framecount for fade out and then the actual scene starts at -120
-				speed_endFrame = 1750;
-			}
-			else if (current.cutsceneSequence == "MV_ME06_Tachy_Die_Master") {
-				//tachy finisher
-				speed_startFrame = 650; //start after KILLER animation
-				speed_endFrame = 8500; //stop just before we fade out?
-			}
-			else if (current.cutsceneSequence == "MV_Xion01_AfterMatrix") { //xion fadein after tachy
-				speed_startFrame = 10; //start after fadein?
-				speed_endFrame = 500; //stop before fadeout?
-			}
-			else if (current.cutsceneSequence == "Dialogue_Xion06_Phase3_AfterMatrix_TalkAfterLanding") {
-				//skip long establishing shot in orcal's chamber
-				speed_startFrame = -750;
-				speed_endFrame = -250;
-				timeScaleDesired = 10.0f;
-				//continues being a dialogue masher until frame 6680, stop at 6650?
-			}
-			else if (current.cutsceneSequence == "Dialogue_Xion01_Phase3_AfterMatrix_AgitEnter") {
-				speed_startFrame = 30;
-				speed_endFrame = 1000;
-				timeScaleDesired = 4.0f;
-				vars.inDialogueMasher = true;
-			}
-			else if (current.cutsceneSequence == "MV_Xion01_Legacy2_Hologram") {
-				speed_startFrame = -450;
-				speed_endFrame = 5900;
-			}
-			else if (current.cutsceneSequence == "TS_Xion01_Adam_P4_TalkAdam_Q") {
-				speed_startFrame = -50;
-				speed_endFrame = 287;
-				timeScaleDesired = 4.0f;
-			}
-			else if (current.cutsceneSequence == "MV_AYL03_Legacy3_Hologram") {
-				//this is when we actually start the legacy section
-				speed_startFrame = -25;
-				speed_endFrame = 5500;
-			}
-			else if (current.cutsceneSequence == "MV_Xion01_PODAfterAYLLanding_Main") {
-				//landing after abyss
-				speed_startFrame = 630;
-				speed_endFrame = 1050;
-			}
-			else if (current.cutsceneSequence == "MV_SE10_AlphaNative_QTE_Master") {
-				//democrawler into demogorgon
-				speed_startFrame = 2400;
-				speed_endFrame = 5250;
-			}
-			else if (current.cutsceneSequence == "Dialogue_WLA10_POD_Inside") {
-				speed_startFrame = 10;
-				speed_endFrame = 1337;
-				timeScaleDesired = 4.0f;
-				vars.inDialogueMasher = true;
-			}
-			else if (current.cutsceneSequence == "Dialogue_Xion01_P5_PodAgitLanding") {
-				speed_startFrame = 20;
-				speed_endFrame = 1750;
-			}
-			else if (current.cutsceneSequence == "Dialogue_Xion07_Phase5_DyingElder") {
-				//orcal deadge sadge
-				speed_startFrame = -260;
-				speed_endFrame = 6767;
-			}
-			else if (current.cutsceneSequence == "MV_Nest_RavenBattle_After_Master") {
-				//raven finisher
-				speed_startFrame = 1000;
-				speed_endFrame = 12400;
-			}
-			else {
-				speed_startFrame = -1;
-				speed_endFrame = -1;
+			switch ((string)current.cutsceneSequence)
+			{
+				default:
+					speed_startFrame = -1;
+					speed_endFrame = -1;
+					break;
+				case "MV_DED01_Intro_Master":
+					speed_startFrame = -1160;
+					speed_endFrame = -300;
+					break;
+				//dialogue mashers are NOT working with this speedup method, we wind up losing a TON of time
+				//the delay before you can mash isn't time dilated, we work around it by writing to a cooldown override variable,
+				//but that isn't used reliably in every sequence.  need to test each dialogue masher and ensure the time doesn't deviate too heavily
+				case "MV_DED03_DropPod":
+					speed_startFrame = 5100;
+					speed_endFrame = 5720;
+					timeScaleDesired = 20.0f;
+					break;
+				case "Dialogue_POD_ToXion1st": //this is a dialogue masher
+					speed_startFrame = -240;
+					speed_endFrame = 5950;
+					timeScaleDesired = 6.0f;
+					vars.inDialogueMasher = true;
+					break;
+				/* //WEIRD DELAYS BREAK THESE
+				case "TS_POD_ToXion_SelectionA":
+					speed_startFrame = 60;
+					speed_endFrame = 1620; //bottom (slower) choice runs to frame 1822
+					timeScaleDesired = 6.0f;
+					vars.inDialogueMasher = true;
+					break;
+				case "TS_POD_ToXion_SelectionB":
+					speed_startFrame = 30;
+					speed_endFrame = 1820; //bottom (slower) choice runs to frame 1822
+					timeScaleDesired = 6.0f;
+					vars.inDialogueMasher = true;
+					break;
+				case "TS_POD_ToXion_End": //fuck you adam
+					speed_startFrame = 10;
+					speed_endFrame = 600;
+					timeScaleDesired = 6.0f;
+					vars.inDialogueMasher = true;
+					break;*/
+				case "MV_Xion05_InsideLift_GoingDown_Enter_Main1":
+					//going down xion elevator
+					speed_startFrame = 10;
+					speed_endFrame = 450;
+					timeScaleDesired = 10.0f;
+					break;
+				case "MV_Xion05_InsideLift_GoingDown_Leave_Main2":
+					//getting off xion elevator (alone)
+					speed_startFrame = -225;
+					speed_endFrame = 250;
+					timeScaleDesired = 10.0f;
+					break;
+				case "MV_Xion05_InsideLift_GoingUp_Leave_WithAdamLily_Main2":
+					//riding up lift in xion 1 (removeme?)
+					speed_startFrame = -240;
+					speed_endFrame = 140;
+					timeScaleDesired = 10.0f;
+					break;
+				/*case "Subtitle_Xion06_P1_SmallTalk_Rael_02": //has a weird mash delay, fix this later?
+					vars.inDialogueMasher = true;
+					speed_startFrame = 10;
+					speed_endFrame = 820;
+					timeScaleDesired = 4.0f;
+					break;*/
+				case "Dialogue_Xion07_Phase1_HyperDriveRoomEnter":
+					//first long unskippable bit into mashable hypercell cutscene
+					speed_startFrame = -1030;
+					speed_endFrame = -20;
+					//runs as a dialogue masher up to frame 1529, could lower the speeduprate from -20 to 1450
+					timeScaleDesired = 20.0f;
+					break;
+				case "Dialogue_Xion06_Phase2_ElderInteraction":
+					speed_startFrame = -60;
+					speed_endFrame = 5325;
+					timeScaleDesired = 4.0f;
+					vars.inDialogueMasher = true;
+					break;
+				case "MV_Xion01_SmallTalkAfterChamber_Trnasit": //outside xion after orcal chamber
+					speed_startFrame = 6;
+					speed_endFrame = 110;
+					timeScaleDesired = 10.0f;
+					break;
+				case "Dialogue_Xion01_Phase1_SmallTalk_Street2":
+					//left orcal's chamber, long establishing shot
+					speed_startFrame = -680;
+					speed_endFrame = -75;
+					timeScaleDesired = 10.0f;
+					//runs as dialogue masher to frame 3260, could speed it up by 4x until 3200
+					break;
+				case "Dialogue_Xion01_Phase2_SmallTalk_Street3": //sister's junk TEST & TIME THIS!!!!!!!!
+					speed_startFrame = 10;
+					speed_endFrame = 6967;
+					timeScaleDesired = 4.0f;
+					vars.inDialogueMasher = true;
+					break;
+				case "MV_Xion01_DroneUpgrade_Main":
+					//IT'S AN EVOLUTION!!!
+					speed_startFrame = 2472;
+					speed_endFrame = 3072;
+					timeScaleDesired = 10.0f;
+					break;
+				case "Dialogue_Xion01_Phase1_DroneUpgrade": //TIME THIS SHIT!!!!!!!!!!!!
+					speed_startFrame = -50;
+					speed_endFrame = 1150;
+					timeScaleDesired = 4.0f;
+					vars.inDialogueMasher = true;
+					break;
+				case "Dialogue_Xion01_Phase2_Agit_WithAdam": //dialogue mashing starts at around ~120
+					//"the wasteland is that way.."
+					speed_startFrame = 4200;
+					speed_endFrame = 4950;
+					timeScaleDesired = 10.0f;
+					break;
+				case "Dialogue_Xion01_Phase3_SmallTalkAfterChamber":
+					//xion 2 cutscene after orcal/hypercell chamber (we skip this in any%)
+					speed_startFrame = 120; //would be nicer to start this earlier but it has the same issue where positive framecount for fade out and then the actual scene starts at -120
+					speed_endFrame = 1750;
+					break;
+				case "MV_ME06_Tachy_Die_Master":
+					//tachy finisher
+					speed_startFrame = 650; //start after KILLER animation
+					speed_endFrame = 8500; //stop just before we fade out?
+					break;
+				case "MV_Xion01_AfterMatrix": //xion fadein after tachy
+					speed_startFrame = 10; //start after fadein?
+					speed_endFrame = 500; //stop before fadeout?
+					break;
+				case "Dialogue_Xion06_Phase3_AfterMatrix_TalkAfterLanding":
+					//skip long establishing shot in orcal's chamber
+					speed_startFrame = -750;
+					speed_endFrame = -250;
+					timeScaleDesired = 10.0f;
+					//continues being a dialogue masher until frame 6680, stop at 6650?
+					break;
+				case "Dialogue_Xion01_Phase3_AfterMatrix_AgitEnter":
+					speed_startFrame = 30;
+					speed_endFrame = 1000;
+					timeScaleDesired = 4.0f;
+					vars.inDialogueMasher = true;
+					break;
+				case "MV_Xion01_Legacy2_Hologram":
+					speed_startFrame = -450;
+					speed_endFrame = 5900;
+					break;
+				case "TS_Xion01_Adam_P4_TalkAdam_Q":
+					speed_startFrame = -50;
+					speed_endFrame = 287;
+					timeScaleDesired = 4.0f;
+					break;
+				case "MV_AYL03_Legacy3_Hologram":
+					//this is when we actually start the legacy section
+					speed_startFrame = -25;
+					speed_endFrame = 5500;
+					break;
+				case "MV_Xion01_PODAfterAYLLanding_Main":
+					//landing after abyss
+					speed_startFrame = 630;
+					speed_endFrame = 1050;
+					break;
+				case "MV_SE10_AlphaNative_QTE_Master":
+					//democrawler into demogorgon
+					speed_startFrame = 2400;
+					speed_endFrame = 5250;
+					break;
+				case "Dialogue_WLA10_POD_Inside":
+					speed_startFrame = 10;
+					speed_endFrame = 1337;
+					timeScaleDesired = 4.0f;
+					vars.inDialogueMasher = true;
+					break;
+				case "Dialogue_Xion01_P5_PodAgitLanding":
+					speed_startFrame = 20;
+					speed_endFrame = 1750;
+					break;
+				case "Dialogue_Xion07_Phase5_DyingElder":
+					//orcal deadge sadge
+					speed_startFrame = -260;
+					speed_endFrame = 6767;
+					break;
+				case "MV_Nest_RavenBattle_After_Master":
+					//raven finisher
+					speed_startFrame = 1000;
+					speed_endFrame = 12400;
+					break;
 			}
 		}
 		else if (current.cutsceneFrameNum == old.cutsceneFrameNum) { //idk idk idk
