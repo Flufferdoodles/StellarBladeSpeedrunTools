@@ -124,6 +124,7 @@ startup
 	settings.CurrentDefaultParent = null;
 
     #region EventSplits
+	//FIXME: change all of these to use cutsceneSequence strings since that is more reliable
 	vars.eventRegistry = new Dictionary<string, Tuple<string, string>>(); // split name, (event string, split category)
 
     vars.Events = new object[] {
@@ -225,11 +226,10 @@ startup
         new object[] { "Raven Finisher", "/Theater/WasteLandA/WLA10/Theater/MV_WLA_Nest_RavenBattle_QTE_Master.MV_WLA_Nest_RavenBattle_QTE_Master", "Wasteland Endgame" },
 
         // Nest
-        new object[] { "Adam Cutscene", "/Theater/Nest/Nest20/Theater/MV_Nest_EncounterAdam.MV_Nest_EncounterAdam", "Nest" },
-        new object[] { "Providence Finisher", "/Theater/Nest/Nest20/Theater/MV_Nest_FinalBattle_Lily_QTE_Die.MV_Nest_FinalBattle_Lily_QTE_Die", "Nest" },
-        // new object[] { "End Credits", "/Theater/Nest/Nest40/Theater/MV_Nest_LilyEnding_Credits_Die.MV_Nest_LilyEnding_Credits_Die", "Nest" },
-        new object[] { "Adam Transitions Into Elder Naytiba", "/Theater/Nest/Nest20/Theater/MV_Nest_BattleAdam_Phase2.MV_Nest_BattleAdam_Phase2", "Nest" },
-        new object[] { "Elder Naytiba Finisher", "/Theater/Nest/Nest30/Theater/MV_Nest_FinalBattle_Adam_QTE.MV_Nest_FinalBattle_Adam_QTE", "Nest" },
+        new object[] { "Adam Cutscene", "/Theater/Nest/Nest20/Theater/MV_Nest_EncounterAdam.MV_Nest_EncounterAdam", "Nest" }, //MV_Nest_EncounterAdam_Master_En
+        new object[] { "Providence Finisher", "/Theater/Nest/Nest20/Theater/MV_Nest_FinalBattle_Lily_QTE_Die.MV_Nest_FinalBattle_Lily_QTE_Die", "Nest" }, // MV_Nest_FinalBattle_Lily_QTE_S01_Master
+        new object[] { "Adam Transitions Into Elder Naytiba", "/Theater/Nest/Nest20/Theater/MV_Nest_BattleAdam_Phase2.MV_Nest_BattleAdam_Phase2", "Nest" }, //MV_Nest_BattleAdam_Phase2_Master
+        new object[] { "Elder Naytiba Finisher", "/Theater/Nest/Nest30/Theater/MV_Nest_FinalBattle_Adam_QTE.MV_Nest_FinalBattle_Adam_QTE", "Nest" }, //MV_Nest_FinalBattle_Adam_QTE_S01_Master
         new object[] { "Return to the Colony", "/Theater/Nest/Nest40/Theater/MV_Nest_BattleAdam_After_03.MV_Nest_BattleAdam_After_03", "Nest" }
     };
 
@@ -324,8 +324,14 @@ split
 	}
 
 	//auto end
-	if (current.cutsceneSequence == "MV_Nest_BattleAdam_After_03") {
+	if (current.cutsceneSequence == "MV_Nest_LilyEnding_Credits_Save") { //"true" ending
+		return (current.cutsceneFrameNum >= 370);
+	}
+	if (current.cutsceneSequence == "MV_Nest_BattleAdam_After_03") { //"bad" ending
 		return (current.cutsceneFrameNum >= 3520);
+	}
+	if (current.cutsceneSequence == "MV_Nest_LilyEnding_Credits_Die") { //"worst" ending
+		return (current.cutsceneFrameNum >= 175);
 	}
 }
 
