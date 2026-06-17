@@ -20,7 +20,7 @@ state("SB-Win64-Shipping", "1.4.1")
 	//void *AnimationPlayer : 0x07031700, 0x20, 0x0, 0x60;
 	//int cutsceneStartFrame : 0x07031700, 0x20, 0x0, 0x60, 0x470;
 	//int cutsceneDurationFrames : 0x07031700, 0x20, 0x0, 0x60, 0x474;
-	float cutscenePlayrate : 0x07031700, 0x20, 0x0, 0x60, 0x484; //maybe use this instead of timescale
+	float cutscenePlayrate : 0x07031700, 0x20, 0x0, 0x60, 0x488; //maybe use this instead of timescale
 	float overrideSubtitleCoolTime : 0x07031700, 0x20, 0x0, 0x60, 0x648, 0x31C;
 	string256 cutsceneSequence : 0x07031700, 0x20, 0x0, 0x60, 0x730, 0x0;
 	//string256 cutsceneSequence2 : 0x07031700, 0x20, 0x0, 0x60, 0x760, 0x0; //probably redundant?
@@ -73,7 +73,7 @@ state("SB-Win64-Shipping", "1.1.0")
 	//void *AnimationPlayer : 0x07070FA8, 0x20, 0x0, 0x60; //this isn't a real thing im just putting it here for safe keeping
 	//int cutsceneStartFrame : 0x07070FA8, 0x20, 0x0, 0x60, 0x470; //signed integer
 	//int cutsceneDurationFrames : 0x07070FA8, 0x20, 0x0, 0x60, 0x474; //signed integer
-	float cutscenePlayrate : 0x07070FA8, 0x20, 0x0, 0x60, 0x484; //maybe use this instead of timescale
+	float cutscenePlayrate : 0x07070FA8, 0x20, 0x0, 0x60, 0x488; //maybe use this instead of timescale
 	float overrideSubtitleCoolTime : 0x07070FA8, 0x20, 0x0, 0x60, 0x648, 0x31C;
 	string256 cutsceneSequence : 0x07070FA8, 0x20, 0x0, 0x60, 0x730, 0x0;
 	//string256 cutsceneSequence2 : 0x07070FA8, 0x20, 0x0, 0x60, 0x760, 0x0; //probably redundant...
@@ -357,7 +357,7 @@ start
 update
 {
 	//debug
- 	if (current.Event != old.Event && current.Event != null) {
+	if (current.Event != old.Event && current.Event != null) {
 		print("dbgFilter: current.Event: \"" + current.Event + "\",");
 		vars.EventString = current.Event; //track this here since it gets 0'd out on next update
 	}
@@ -388,16 +388,12 @@ update
 		if (current.cutsceneSequence != null && //this is probably the only condition we need now
 			current.cutsceneFrameNum > old.cutsceneFrameNum) //do this while the cutsceneFrameNum is being incremented
 		{
-			int frameNum = current.cutsceneFrameNum; //saves some typing
-
 			vars.inCutscene = true; //this is probably doing nothing RN
 			vars.inDialogueMasher = false;
+
 			switch ((string)current.cutsceneSequence)
 			{
-				default:
-					speed_startFrame = -1;
-					speed_endFrame = -1;
-					break;
+				default: break;
 				case "MV_DED01_Intro_Master":
 					speed_startFrame = -1160;
 					speed_endFrame = -300;
@@ -615,7 +611,6 @@ update
 					game.WriteValue<float>(addr, cooldownOverride);
 			}
 		}
-
 
 		if (current.timeScale > 1.0f) print("current timeScale " + current.timeScale);
 		//a kind of debug assertion popup, using this to make sure we don't go any faster than 2.5f during gameplay
