@@ -344,7 +344,7 @@ split
 
 	//auto end, split on credits
 	switch ((string)current.cutsceneSequence)
-	{
+	{ //fixme: do this only once?  doesn't matter currently because there's no category that involves multiple playthroughs
 		case "MV_Nest_LilyEnding_Credits_Save": //"true" ending
 			return (current.cutsceneFrameNum >= 370);
 		case "MV_Nest_BattleAdam_After_03": //"bad" ending
@@ -396,7 +396,7 @@ update
 		}
 	}
 
-
+	#region Cutscenes Speedup
 	//Need to test each sequence and make sure the timing hasn't deviated too much from the old LRT before adding more
 	//How this works is we check the ID of the currently playing animationSequence and define a range of frames that
 	//we speed up by, currently we're setting the global timeDilation property, but we can probably just speed up the actual sequenceplayer instead
@@ -529,9 +529,26 @@ update
 					speed_endFrame = 4950;
 					timeScaleDesired = 10.0f;
 					break;
+				case "Subtitle_ATL02_ElevatorLilyDrone": //long elevator in altess levoire TEST & TIME ME!!!
+					speed_startFrame = 0;
+					speed_endFrame = 1050;
+					timeScaleDesired = 20.0f;
+					break;
+				case "MV_ATL03_Legacy1_Hologram": //altess levoire legacy TIME TIME TIME
+					speed_startFrame = -60;
+					speed_endFrame = 7100;
+					timeScaleDesired = 4.0f;
+					vars.inDialogueMasher = true;
+					break;
+				case "Dialogue_ATL03_Legacy1End": //altess levoire legacy TIME TIME TIME
+					speed_startFrame = -60;
+					speed_endFrame = 2200;
+					timeScaleDesired = 4.0f;
+					vars.inDialogueMasher = true;
+					break;
 				case "Dialogue_Xion01_Phase3_SmallTalkAfterChamber":
 					//xion 2 cutscene after orcal/hypercell chamber (we skip this in any%)
-					speed_startFrame = 120; //would be nicer to start this earlier but it has the same issue where positive framecount for fade out and then the actual scene starts at -120
+					speed_startFrame = -100;
 					speed_endFrame = 1750;
 					break;
 				case "MV_ME06_Tachy_Die_Master":
@@ -539,64 +556,88 @@ update
 					speed_startFrame = 650; //start after KILLER animation
 					speed_endFrame = 8500; //stop just before we fade out?
 					break;
-				case "MV_Xion01_AfterMatrix": //xion fadein after tachy
+				case "MV_Xion01_AfterMatrix": //xion 3 fadein after tachy
 					speed_startFrame = 10; //start after fadein?
 					speed_endFrame = 500; //stop before fadeout?
 					break;
-				case "Dialogue_Xion06_Phase3_AfterMatrix_TalkAfterLanding":
-					//skip long establishing shot in orcal's chamber
+				case "Dialogue_Xion06_Phase3_AfterMatrix_TalkAfterLanding": //orcal chamber cutscene after tachy (TIME THIS!!!!!!!!!)
 					speed_startFrame = -750;
-					speed_endFrame = -250;
-					timeScaleDesired = 10.0f;
-					//continues being a dialogue masher until frame 6680, stop at 6650?
+					speed_endFrame = 6500; //could stop at 6650 if this isn't long enough
+					timeScaleDesired = 4.0f;
+					vars.inDialogueMasher = true;
 					break;
-				case "Dialogue_Xion01_Phase3_AfterMatrix_AgitEnter":
+				case "Dialogue_Xion01_Phase3_AfterMatrix_AgitEnter": //xion 3 heading out
 					speed_startFrame = 30;
 					speed_endFrame = 1000;
 					timeScaleDesired = 4.0f;
 					vars.inDialogueMasher = true;
 					break;
-				case "MV_Xion01_Legacy2_Hologram":
+				case "MV_Xion01_Legacy2_Hologram": //raven legacy
 					speed_startFrame = -450;
 					speed_endFrame = 5900;
 					break;
 				case "TS_Xion01_Adam_P4_TalkAdam_Q":
 					speed_startFrame = -50;
 					speed_endFrame = 287;
-					timeScaleDesired = 4.0f;
+					timeScaleDesired = 3.0f;
 					break;
-				case "MV_AYL03_Legacy3_Hologram":
-					//this is when we actually start the legacy section
+				case "MV_AYL03_Legacy3_Hologram": //this is when we actually start the legacy section
 					speed_startFrame = -25;
 					speed_endFrame = 5500;
 					break;
-				case "MV_Xion01_PODAfterAYLLanding_Main":
-					//landing after abyss
+				case "Dialogue_WLB10_FirstEnter": //great desert dialogue masher after crashlanding
+					speed_startFrame = -10;
+					speed_endFrame = 1080;
+					timeScaleDesired = 3.0f;
+					vars.inDialogueMasher = true;
+					break;
+				case "Subtitle_WLB_MapGuide": //great desert standstill dialogue masher after landing
+					speed_startFrame = 0;
+					speed_endFrame = 480;
+					timeScaleDesired = 3.0f;
+					vars.inDialogueMasher = true;
+					break;
+				case "MV_Xion01_PODAfterAYLLanding_Main": //xion 4 landing after abyss
 					speed_startFrame = 630;
 					speed_endFrame = 1050;
 					break;
-				case "MV_SE10_AlphaNative_QTE_Master":
-					//democrawler into demogorgon
+				/*	NOTES for arisa:
+					MV_SE07_02_PassengerElevatorTeleport_Master is the cutscene we come in on, it skips to frame 2400
+					don't want to speed up here because we have to actually interact with her and do our menuing etc.
+					2nd floor cutscene is MV_SE08_ArisaToThe2ndFloor, skip jumps to frame 486, we could fast forward while she does the following:
+					EnvObj_SE08_ArisaPlay2a_2ndFloor is when she stops and talks about the beds, runs from frame 0 to 381, then she walks across the room and does
+					EnvObj_SE08_ArisaPlay2b_2ndFloor is the window cutscene, runs from frame 0 to 997, then she walks to the door and
+					EnvObj_SE08_ArisaPlay3_2ndFloor is where she opens the door, use this to stop the fast forward
+				*/
+				/*	NOTES for Orbit Elevator
+					MV_SE08_PassengerElevatorTeleport_Master frame 875 is when we enter the orbit elevator
+					there is no event for arriving at the destination, so we will have to do an ugly hack where we fast forward for however long it takes to reach the destination
+				*/
+				case "MV_SE10_AlphaNative_QTE_Master": //democrawler into demogorgon
 					speed_startFrame = 2400;
 					speed_endFrame = 5250;
 					break;
-				case "Dialogue_WLA10_POD_Inside":
+				case "Dialogue_WLA10_POD_Inside": //dialogue masher before burning xion
 					speed_startFrame = 10;
 					speed_endFrame = 1337;
 					timeScaleDesired = 4.0f;
 					vars.inDialogueMasher = true;
 					break;
-				case "Dialogue_Xion01_P5_PodAgitLanding":
+				case "Dialogue_Xion01_P5_PodAgitLanding": //burning xion arrival
 					speed_startFrame = 20;
 					speed_endFrame = 1750;
 					break;
-				case "Dialogue_Xion07_Phase5_DyingElder":
-					//orcal deadge sadge
+				case "Dialogue_Xion07_Phase5_DyingElder": //orcal deadge sadge
 					speed_startFrame = -260;
 					speed_endFrame = 6767;
 					break;
-				case "MV_Nest_RavenBattle_After_Master":
-					//raven finisher
+				case "Dialogue_Xion01_P5_LilyTalk": //dialogue masher with lily before burning xion ends
+					speed_startFrame = -10;
+					speed_endFrame = 2750; //options appear at ~2830, ending a bit sooner
+					timeScaleDesired = 3.0f;
+					vars.inDialogueMasher = true;
+					break;
+				case "MV_Nest_RavenBattle_After_Master": //raven finisher
 					speed_startFrame = 1000;
 					speed_endFrame = 12400;
 					break;
@@ -646,6 +687,7 @@ update
 				MessageBoxButtons.OK, MessageBoxIcon.Question);
 		}
 	}
+	#endregion
 }
 
 exit
