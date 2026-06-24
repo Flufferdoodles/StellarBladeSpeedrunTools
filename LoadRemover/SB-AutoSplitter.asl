@@ -141,8 +141,12 @@ startup
 		new object[] { "Abaddon Finisher QTE", "MV_DED01_Parkinglot_AfterBattle_Master", "Eidos 7" },
 		new object[] { "Left Parking Tower", "MV_DED_Area01_ParkingTower_Exit", "Eidos 7" },
 		new object[] { "Flooded Commercial Sector Discovery", "MV_DED02_ShoppingMallEnter_Master", "Eidos 7" },
+		new object[] { "Entered Hall of Records", "MV_DED02_WarpToArchive", "Eidos 7" },
 		new object[] { "Corruptor Entrance", "MV_DED02_Elite_GrubShooter_Master", "Eidos 7" },
 		new object[] { "Corruptor Finisher", "MV_DED02_Elite_GrubShooterFinish_Maste", "Eidos 7" },
+		new object[] { "Construction Zone Discovery", "MV_DED02_EnterConstructionSite_Transit", "Eidos 7" },
+		new object[] { "All Crane Keycards", "Subtitle_DED02_GetCraneAccess3", "Eidos 7" },
+		new object[] { "Second Sewer Camp", "Subtitle_DED03_Find2ndCamp", "Eidos 7" },
 
 		// Gigas
 		new object[] { "Gigas Fight Start", "MV_DED03_BetaNative_Intro_01_QTE_Master", "Gigas" },
@@ -203,6 +207,7 @@ startup
 		new object[] { "Belial #1 Start Cutscene", "MV_SE04_Chasing_Master", "Spire 4" },
 		new object[] { "Belial #1 End Cutscene", "MV_SE04_WeaponMaster_RunAway", "Spire 4" },
 		new object[] { "Space Logistics Complex discovery", "MV_SE05_EntranceView_Main", "Spire 4" },
+		new object[] { "Turret Conveyor Exit", "MV_SE05_ElevatorView_Main", "Spire 4" },
 		new object[] { "Raphael Space Center Discovery", "MV_SE06_LobbyEntrance_Main", "Spire 4" },
 		new object[] { "Belial Fight Start", "MV_SE06_LobbyEliteSpawn_Main", "Spire 4" },
 		new object[] { "Belial Finisher", "MV_SE06_LobbyEliteFinish_Main", "Spire 4" },
