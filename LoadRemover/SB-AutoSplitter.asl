@@ -137,6 +137,7 @@ startup
 	settings.Add("timer_ext", false, "Extended timer options");
 	settings.CurrentDefaultParent = "timer_ext";
 		settings.Add("time_igt", false, "Time with just IGT delta, this will skew from realtime during regular gameplay");
+		settings.Add("debug_spew", false, "Spew current sequence ID and frame number to dbgView");
 		settings.Add("cutscene_speedup", false, "Speedup unskippable cutscenes and keep LRT in-sync");
 	settings.CurrentDefaultParent = null;
 
@@ -325,7 +326,7 @@ gameTime
 	}
 
 	vars.trackedTime = TimeSpan.FromSeconds(vars.trackedTime.TotalSeconds + delta); //why does this work but not vars.trackedTime.Add LMFAO??
-	print(vars.trackedTime.ToString());
+	//print(vars.trackedTime.ToString());
 	return vars.trackedTime;
 }
 
@@ -360,10 +361,10 @@ reset
 
 start
 {
-	if (current.Event != old.Event) { //for testing
-		if (current.Event == "/Theater/DrownedEidosDistrict/DED03/Theaters/MV_DED03_DropPod.MV_DED03_DropPod")
+	if (current.cutsceneSequence != old.cutsceneSequence) { //for testing
+		if (current.cutsceneSequence == "MV_DED03_DropPod")
 			return true;
-		if (current.Event == "meDesign/Level/Theater/Matrix/MatrixXI/ME06/Theaters/MV_ME06_Tachy_Die_Theater.MV_ME06_Tachy_Die_Theater'")
+		if (current.cutsceneSequence == "MV_ME06_Tachy_Die_Master")
 			return true;
 	}
 
@@ -378,20 +379,23 @@ start
 update
 {
 	//debug
+	/*
 	if (current.Event != old.Event && current.Event != null) {
 		print("dbgFilter: current.Event: \"" + current.Event + "\",");
 		vars.EventString = current.Event; //track this here since it gets 0'd out on next update
 	}
 
-	if (current.event_id == (old.event_id + 1) && current.event_id < 60 && current.event_id > 30)
+	if (current.event_id == (old.event_id + 1) && current.event_id < 60 && current.event_id > 30) {
 		print("dbgFilter: current.event_id: " + current.event_id + " old.event_id: " + old.event_id);
+	}
+	*/
+	if (settings["debug_spew"]) {
+		if ((current.cutsceneSequence != null && current.cutsceneSequence != old.cutsceneSequence)
+			|| current.cutsceneFrameNum != old.cutsceneFrameNum) {
+			print("framenumber: " + current.cutsceneFrameNum.ToString() + " cutscene: " + current.cutsceneSequence);
+		}
+	}
 
-	//if (current.cutsceneSequence != old.cutsceneSequence && current.cutsceneSequence != null)
-		//print("cutsceneID " + current.cutsceneSequence + " cutsceneStartFrame " + current.cutsceneStartFrame + " cutsceneDurationFrames " + current.cutsceneDurationFrames);
-
-	//if (current.cutsceneFrameNum != old.cutsceneFrameNum)
-	if ((current.cutsceneSequence != null && current.cutsceneSequence != old.cutsceneSequence) || current.cutsceneFrameNum != old.cutsceneFrameNum)
-		print("framenumber: " + current.cutsceneFrameNum.ToString() + " cutscene: " + current.cutsceneSequence);
 
 	//Need to test each sequence and make sure the timing hasn't deviated too much from the old LRT before adding more
 	//How this works is we check the ID of the currently playing animationSequence and define a range of frames that
