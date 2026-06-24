@@ -113,6 +113,23 @@ init
 		vars.eventRegistry.Add(name, new Tuple<string, string>(eventString, category));
 		return true;
 	});
+
+	if (timer.CurrentPhase == TimerPhase.Running)
+	{ //THIS IS JUST DEVELOPMENT QOL
+		foreach (var evt in vars.Events) {
+			bool alreadyAdded = false;
+			// evt[0] = name, evt[1] = event string, evt[2] = section
+			if (settings[evt[0]] == true) {
+				foreach (var entry in vars.eventRegistry) {
+					if (evt[1] == entry.Value.Item1) {
+						alreadyAdded = true;
+						break;
+					}
+				}
+				if (!alreadyAdded) vars.AddEventToRegistry(evt[0], evt[1], evt[2]);
+			}
+		}
+	}
 }
 
 startup
