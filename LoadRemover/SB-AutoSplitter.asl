@@ -217,7 +217,7 @@ startup
 		new object[] { "Legacy 3 Cutscene", "MV_AYL06_Legacy3_GainHyperCell", "Abyss Levoire" },
 
 		// Xion #4
-		new object[] { "Landing Cutscene", "MV_Xion01_PODAfterAYLLanding", "Xion #4" },
+		new object[] { "Landing Cutscene", "MV_Xion01_PODAfterATLLanding_Main", "Xion #4" },
 
 		// Spire 4
 		new object[] { "Intro Cutscene", "MV_SE01_Intro_Master", "Spire 4" },
