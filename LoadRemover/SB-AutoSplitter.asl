@@ -139,6 +139,7 @@ startup
 		settings.Add("time_igt", false, "Time with just IGT delta, this will skew from realtime during regular gameplay");
 		settings.Add("debug_spew", false, "Spew current sequence ID and frame number to dbgView");
 		settings.Add("cutscene_speedup", false, "Speedup unskippable cutscenes and keep LRT in-sync");
+		settings.Add("masher_speedup", false, "Speedup dialogue mashing sequences");
 	settings.CurrentDefaultParent = null;
 
 	#region EventSplits
@@ -661,6 +662,10 @@ update
 			//I don't like relying on the 2.5f magic number everywhere
 			if (timer.CurrentPhase == TimerPhase.Running)
 				timeScaleOverride = 1.0f; //shouldn't get here, but just incase don't leave us sped up if we aren't trying to speed up anything
+		}
+
+		if (!settings["masher_speedup"] && vars.inDialogueMasher) {
+			timeScaleOverride = 1.0f;
 		}
 
 		if (timeScaleOverride != -1.0f && timeScaleOverride != current.timeScale)
