@@ -343,15 +343,17 @@ split
 		}
 	}
 
-	//auto end, split on credits
-	switch ((string)current.cutsceneSequence)
-	{ //fixme: do this only once?  doesn't matter currently because there's no category that involves multiple playthroughs
-		case "MV_Nest_LilyEnding_Credits_Save": //"true" ending
-			return (current.cutsceneFrameNum >= 370);
-		case "MV_Nest_BattleAdam_After_03": //"bad" ending
-			return (current.cutsceneFrameNum >= 3520);
-		case "MV_Nest_LilyEnding_Credits_Die": //"worst" ending
-			return (current.cutsceneFrameNum >= 175);
+	if (timer.CurrentSplitIndex == (timer.Run.Count - 1))
+	{ //only do this on final split
+		switch ((string)current.cutsceneSequence)
+		{ //auto end, split on credits
+			case "MV_Nest_LilyEnding_Credits_Save": //"true" ending
+				return (current.cutsceneFrameNum >= 370);
+			case "MV_Nest_BattleAdam_After_03": //"bad" ending
+				return (current.cutsceneFrameNum >= 3520);
+			case "MV_Nest_LilyEnding_Credits_Die": //"worst" ending
+				return (current.cutsceneFrameNum >= 175);
+		}
 	}
 }
 
