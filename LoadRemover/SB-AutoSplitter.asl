@@ -20,10 +20,8 @@ state("SB-Win64-Shipping", "1.4.1")
 	//void *AnimationPlayer : 0x07031700, 0x20, 0x0, 0x60;
 	//int cutsceneStartFrame : 0x07031700, 0x20, 0x0, 0x60, 0x470;
 	//int cutsceneDurationFrames : 0x07031700, 0x20, 0x0, 0x60, 0x474;
-	float cutscenePlayrate : 0x07031700, 0x20, 0x0, 0x60, 0x488; //maybe use this instead of timescale
 	float overrideSubtitleCoolTime : 0x07031700, 0x20, 0x0, 0x60, 0x648, 0x31C;
 	string256 cutsceneSequence : 0x07031700, 0x20, 0x0, 0x60, 0x730, 0x0;
-	//string256 cutsceneSequence2 : 0x07031700, 0x20, 0x0, 0x60, 0x760, 0x0; //probably redundant?
 }
 
 state("SB-Win64-Shipping", "1.4.0")
@@ -73,10 +71,8 @@ state("SB-Win64-Shipping", "1.1.0")
 	//void *AnimationPlayer : 0x07070FA8, 0x20, 0x0, 0x60; //this isn't a real thing im just putting it here for safe keeping
 	//int cutsceneStartFrame : 0x07070FA8, 0x20, 0x0, 0x60, 0x470; //signed integer
 	//int cutsceneDurationFrames : 0x07070FA8, 0x20, 0x0, 0x60, 0x474; //signed integer
-	float cutscenePlayrate : 0x07070FA8, 0x20, 0x0, 0x60, 0x488; //maybe use this instead of timescale
 	float overrideSubtitleCoolTime : 0x07070FA8, 0x20, 0x0, 0x60, 0x648, 0x31C;
 	string256 cutsceneSequence : 0x07070FA8, 0x20, 0x0, 0x60, 0x730, 0x0;
-	//string256 cutsceneSequence2 : 0x07070FA8, 0x20, 0x0, 0x60, 0x760, 0x0; //probably redundant...
 }
 
 init
@@ -218,7 +214,7 @@ startup
 		new object[] { "Legacy 3 Cutscene", "MV_AYL06_Legacy3_GainHyperCell", "Abyss Levoire" },
 
 		// Xion #4
-		new object[] { "Landing Cutscene", "MV_Xion01_PODAfterATLLanding_Main", "Xion #4" },
+		new object[] { "Landing Cutscene", "MV_Xion01_PODAfterATLLanding_Main", "Xion #4" }, //this has same ID as the one from Xion #2?
 
 		// Spire 4
 		new object[] { "Intro Cutscene", "MV_SE01_Intro_Master", "Spire 4" },
@@ -288,7 +284,7 @@ onStart
     #endregion
 
 	//reset tracked IGT
-	vars.trackedTime = timer.CurrentTime.GameTime;
+	vars.trackedTime = TimeSpan.Zero;
 }
 
 isLoading
@@ -311,15 +307,16 @@ gameTime
 		return vars.trackedTime;
 	}
 
-	if (delta < 0.01f)
+	if (delta <= 0.0f)
 	{ //reloaded checkpoint or UnpausedTimeSeconds rolled back, don't add delta
 		//print("reloaded checkpoint or something");
 		vars.trackedTime = timer.CurrentTime.GameTime;
 		return vars.trackedTime;
 	}
 
-	if (current.timeScale <= 2.5f) {
-		//normal, act like LRT?
+	if (current.timeScale <= 2.5f && !vars.inDialogueMasher && current.timeScale == old.timeScale)
+	{
+		//normal, act like LRT
 		//Infinite Pierce speeds the game up by 2.5x very briefly, which is why we're comparing to that
 		//This is necessary or else our new IGT tracking will deviate too much from LRT, as RealWorldSeconds doesn't tick when opening pause menu/loading
 		vars.trackedTime = timer.CurrentTime.GameTime;
@@ -333,6 +330,10 @@ gameTime
 
 split
 {
+	if (settings["debug_spew"]) {
+		return (current.cutsceneSequence != old.cutsceneSequence && old.cutsceneSequence == "Dialogue_POD_ToXion1st");
+	}
+
 	if (current.cutsceneSequence != old.cutsceneSequence) {
 		foreach (var entry in vars.eventRegistry) {
 			// entry.Value.Item1 is the event string
@@ -364,11 +365,8 @@ reset
 
 start
 {
-	if (current.cutsceneSequence != old.cutsceneSequence) { //for testing
-		if (current.cutsceneSequence == "MV_DED03_DropPod")
-			return true;
-		if (current.cutsceneSequence == "MV_ME06_Tachy_Die_Master")
-			return true;
+	if (settings["debug_spew"]) {
+		return (current.cutsceneSequence != old.cutsceneSequence && current.cutsceneSequence == "Dialogue_POD_ToXion1st");
 	}
 
 	// 47 to 48 -- press continue
@@ -405,14 +403,13 @@ update
 	//we speed up by, currently we're setting the global timeDilation property, but we can probably just speed up the actual sequenceplayer instead
 	//I have plugged in a few dialogue mashing sections, these work the same way, but we also write to another field that overrides the
 	//cooldown at which we can skip dialogue via the A button, we do this by a factor of the timescale.  These I am most worried about deviating.
-	if (settings["cutscene_speedup"] && vars.timeScalePtr != null && current.cutsceneSequence != null)
+	if (settings["cutscene_speedup"] && vars.timeScalePtr != null)
 	{
 		float timeScaleOverride = -1.0f;
 		float timeScaleDesired = 67.67f; //override the speedup rate depending on the scene
 		int speed_startFrame = -1;
 		int speed_endFrame = -1;
 
-		//if (vars.EventString != null) print("vars.EventString: " + vars.EventString);
 		if (current.cutsceneSequence != null && //this is probably the only condition we need now
 			current.cutsceneFrameNum > old.cutsceneFrameNum) //do this while the cutsceneFrameNum is being incremented
 		{
@@ -422,34 +419,34 @@ update
 			switch ((string)current.cutsceneSequence)
 			{
 				default: break;
-				case "MV_DED01_Intro_Master":
-					speed_startFrame = -1160;
-					speed_endFrame = -300;
+				case "MV_DED01_Intro_Master": //~29.30 seconds
+					speed_startFrame = -1150;
+					speed_endFrame = -367; //end about a second before skip prompt appears
 					break;
-				//dialogue mashers are NOT working with this speedup method, we wind up losing a TON of time
 				//the delay before you can mash isn't time dilated, we work around it by writing to a cooldown override variable,
 				//but that isn't used reliably in every sequence.  need to test each dialogue masher and ensure the time doesn't deviate too heavily
-				case "MV_DED03_DropPod":
+				case "MV_DED03_DropPod": //~12.75 seconds
 					speed_startFrame = 5100;
-					speed_endFrame = 5720;
+					speed_endFrame = 5700;
 					timeScaleDesired = 20.0f;
 					break;
-				case "Dialogue_POD_ToXion1st": //this is a dialogue masher
+				case "Dialogue_POD_ToXion1st": //~44.15 seconds
 					speed_startFrame = -240;
 					speed_endFrame = 5950;
-					timeScaleDesired = 6.0f;
+					timeScaleDesired = 2.6f; //6.0f;
+					//timeScaleDesired = 8.0f; //6.0f;
 					vars.inDialogueMasher = true;
 					break;
 				/* //WEIRD DELAYS BREAK THESE
 				case "TS_POD_ToXion_SelectionA":
 					speed_startFrame = 60;
-					speed_endFrame = 1620; //bottom (slower) choice runs to frame 1822
+					speed_endFrame = 1620;
 					timeScaleDesired = 6.0f;
 					vars.inDialogueMasher = true;
 					break;
 				case "TS_POD_ToXion_SelectionB":
 					speed_startFrame = 30;
-					speed_endFrame = 1820; //bottom (slower) choice runs to frame 1822
+					speed_endFrame = 1820;
 					timeScaleDesired = 6.0f;
 					vars.inDialogueMasher = true;
 					break;
@@ -646,18 +643,19 @@ update
 					break;
 			}
 		}
-		else if (current.cutsceneFrameNum == old.cutsceneFrameNum) { //idk idk idk
+		else if (current.cutsceneSequence == null) {
 			vars.inCutscene = false;
 		}
 
 		if (vars.inCutscene) {
 				if (speed_endFrame != -1 && current.cutsceneFrameNum >= speed_endFrame) {
-					print("STOP!!!!!");
 					timeScaleOverride = 1.0f;
+					if (current.timeScale != timeScaleOverride)
+						print("STOP!!!!!");
 				}
 				else if (speed_startFrame != -1 && current.cutsceneFrameNum >= speed_startFrame) {
-					print("fast fwd");
 					timeScaleOverride = timeScaleDesired;
+					print("fast fwd");
 				}
 		}
 		else if (current.timeScale > 2.5f) { //this is a fallback, need a better way to check if we *just* left the cutscene?
@@ -670,24 +668,29 @@ update
 			timeScaleOverride = 1.0f;
 		}
 
-		if (timeScaleOverride != -1.0f && timeScaleOverride != current.timeScale)
+		if (timeScaleOverride != -1.0f)
 		{
 			IntPtr addr;
-			if (vars.timeScalePtr.DerefOffsets(game, out addr)) {
-				game.WriteValue<float>(addr, timeScaleOverride);
+			float cooldownOverride = vars.inDialogueMasher ? Math.Abs(1.5f / timeScaleOverride) : 1.5f;
+			//float cooldownOverride = 0.1f;
+			if (timeScaleOverride != current.timeScale) {
+				if (vars.timeScalePtr.DerefOffsets(game, out addr)) //have to nest this for some reason??
+					game.WriteValue<float>(addr, timeScaleOverride);
 			}
-			if (vars.subtitleCoolTimePtr.DerefOffsets(game, out addr)) {
-				float cooldownOverride = Math.Abs(1.5f / timeScaleOverride);
-				if (cooldownOverride == 1.5f)
-					cooldownOverride = 0.0f;
-				if (cooldownOverride != current.overrideSubtitleCoolTime)
+
+			if (cooldownOverride == 1.5f)
+				cooldownOverride = 0.0f;
+
+			//print("cooldownOverride " + cooldownOverride.ToString());
+			if (vars.subtitleCoolTimePtr != null && vars.inDialogueMasher && cooldownOverride != current.overrideSubtitleCoolTime) {
+				if (vars.subtitleCoolTimePtr.DerefOffsets(game, out addr))
 					game.WriteValue<float>(addr, cooldownOverride);
 			}
 		}
 
 		if (current.timeScale > 1.0f) print("current timeScale " + current.timeScale);
 		//a kind of debug assertion popup, using this to make sure we don't go any faster than 2.5f during gameplay
-		if (false && current.timeScale > 2.5f && current.timeScale != old.timeScale && timeScaleOverride != -1.0f && !vars.inCutscene) {
+		if (false && current.timeScale > 2.5f && current.timeScale != old.timeScale && timeScaleOverride == -1.0f && !vars.inCutscene) {
 			MessageBox.Show(
 				"Timescale went over 2.5f!!! (" + current.timeScale.ToString() + ")\n",
 				"LiveSplit | STELLAR BLADE",
