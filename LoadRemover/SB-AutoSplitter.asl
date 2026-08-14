@@ -1,9 +1,9 @@
 state("SB-Win64-Shipping", "current")
 {
     // patch 1.4.1a
-    bool isLoading : 0x70BE018;
-    string512 Event : 0x7031700, 0x18, 0xF8, 0x2C;
-    int event_id : 0x70C5BC4;
+    bool isLoading : 0x70BF018;
+    string512 Event : 0x7031700, 0x18, 0xF8, 0x2C; // TODO
+    int event_id : 0x70C5BC4; // TODO
 }
 
 
