@@ -137,12 +137,12 @@ init
 
 startup
 {
-	settings.Add("timer_ext", false, "Extended timer options");
+	settings.Add("timer_ext", false, "[BETA] Timer options");
 	settings.CurrentDefaultParent = "timer_ext";
-		settings.Add("time_igt", false, "Time with just IGT delta, this will skew from realtime during regular gameplay");
-		settings.Add("debug_spew", false, "Spew current sequence ID and frame number to dbgView");
-		settings.Add("cutscene_speedup", false, "Speedup unskippable cutscenes and keep LRT in-sync");
-		settings.Add("masher_speedup", false, "Speedup dialogue mashing sequences");
+		settings.Add("cutscene_speedup", false, "[BETA] Speedup unskippable cutscenes and keep LRT in-sync");
+		settings.Add("masher_speedup", false, "[BETA] Speedup dialogue mashing sequences");
+		settings.Add("time_igt", false, "[DEBUG] Time with just IGT delta, this will skew from realtime during regular gameplay");
+		settings.Add("debug_spew", false, "[DEBUG] Spew current sequence ID and frame number to dbgView");
 	settings.CurrentDefaultParent = null;
 
 	#region EventSplits
