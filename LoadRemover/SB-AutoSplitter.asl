@@ -4,8 +4,16 @@ state("SB-Win64-Shipping", "current")
     bool isLoading : 0x70BF018;
     string512 Event : 0x7031700, 0x18, 0xF8, 0x2C; // TODO
     int event_id : 0x70C5BC4; // TODO
+	float timeScale : 0x6FFB918, 0x30, 0x268, 0x201C;
+	float TimeSeconds : 0x6FFB918, 0x748;
+	float UnpausedTimeSeconds : 0x6FFB918, 0x74C;
+	int cutsceneFrameNum : 0x07032700, 0x20, 0x0, 0x100;
+	//void *AnimationPlayer : 0x07032700, 0x20, 0x0, 0x60;
+	//int cutsceneStartFrame : 0x07032700, 0x20, 0x0, 0x60, 0x470;
+	//int cutsceneDurationFrames : 0x07032700, 0x20, 0x0, 0x60, 0x474;
+	float overrideSubtitleCoolTime : 0x07032700, 0x20, 0x0, 0x60, 0x648, 0x31C;
+	string256 cutsceneSequence : 0x07032700, 0x20, 0x0, 0x60, 0x730, 0x0;
 }
-
 
 state("SB-Win64-Shipping", "1.4.1")
 {
@@ -84,6 +92,11 @@ init
 			version = "unknown";
 			vars.timeScalePtr = null;
 			vars.subtitleCoolTimePtr = null;
+			break;
+		case 362287104: // 362287104 - ver 1.4.1a
+			version = "1.4.1a";
+			vars.timeScalePtr = new DeepPointer(0x6FFB918, 0x30, 0x268, 0x201C);
+			vars.subtitleCoolTimePtr = new DeepPointer(0x07032700, 0x20, 0x0, 0x60, 0x648, 0x31C);
 			break;
 		case 337035264: // 337035264 - ver 1.4.1
 			version = "1.4.1";
