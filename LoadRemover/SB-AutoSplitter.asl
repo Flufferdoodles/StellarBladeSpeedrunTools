@@ -2,8 +2,6 @@ state("SB-Win64-Shipping", "current")
 {
     // patch 1.4.1a
     bool isLoading : 0x70BF018;
-    string512 Event : 0x7031700, 0x18, 0xF8, 0x2C; // TODO
-    int event_id : 0x70C5BC4; // TODO
 	float timeScale : 0x6FFB918, 0x30, 0x268, 0x201C;
 	float TimeSeconds : 0x6FFB918, 0x748;
 	float UnpausedTimeSeconds : 0x6FFB918, 0x74C;
@@ -19,8 +17,6 @@ state("SB-Win64-Shipping", "1.4.1")
 {
     // patch 1.4.1
     bool isLoading : 0x70BE018;
-    string512 Event : 0x7031700, 0x18, 0xF8, 0x2C;
-    int event_id : 0x70C5BC4;
 	float timeScale : 0x06FFA8F8, 0x30, 0x268, 0x201C;
 	float TimeSeconds : 0x06FFA8F8, 0x748;
 	float UnpausedTimeSeconds : 0x06FFA8F8, 0x74C;
@@ -70,8 +66,6 @@ state("SB-Win64-Shipping", "1.2.0")
 state("SB-Win64-Shipping", "1.1.0")
 {
     bool isLoading : 0x70FD960;
-    string512 Event : 0x7070FA8, 0x18, 0xF8, 0x2C;
-    int event_id : 0x7105438;
 	float timeScale : 0x07038898, 0x30, 0x268, 0x201C;
 	float TimeSeconds : 0x07038898, 0x748;
 	float UnpausedTimeSeconds : 0x07038898, 0x74C;
@@ -393,16 +387,6 @@ start
 update
 {
 	//debug
-	/*
-	if (current.Event != old.Event && current.Event != null) {
-		print("dbgFilter: current.Event: \"" + current.Event + "\",");
-		vars.EventString = current.Event; //track this here since it gets 0'd out on next update
-	}
-
-	if (current.event_id == (old.event_id + 1) && current.event_id < 60 && current.event_id > 30) {
-		print("dbgFilter: current.event_id: " + current.event_id + " old.event_id: " + old.event_id);
-	}
-	*/
 	if (settings["debug_spew"]) {
 		if ((current.cutsceneSequence != null && current.cutsceneSequence != old.cutsceneSequence)
 			|| current.cutsceneFrameNum != old.cutsceneFrameNum) {
