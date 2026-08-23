@@ -11,6 +11,7 @@ state("SB-Win64-Shipping", "current")
 	//int cutsceneDurationFrames : 0x07032700, 0x20, 0x0, 0x60, 0x474;
 	float overrideSubtitleCoolTime : 0x07032700, 0x20, 0x0, 0x60, 0x648, 0x31C;
 	string256 cutsceneSequence : 0x07032700, 0x20, 0x0, 0x60, 0x730, 0x0;
+	// int event_id : 0x70C6BDC; // used for debug, accurate but unused address
 }
 
 state("SB-Win64-Shipping", "1.4.1")
@@ -291,7 +292,7 @@ onStart
     #endregion
 
 	//reset tracked IGT
-	vars.trackedTime = TimeSpan.FromSeconds(0.97);
+	vars.trackedTime = TimeSpan.FromSeconds(3.77); // difference between event_id and new strat for starting splitter
 	timer.SetGameTime(vars.trackedTime);
 }
 
@@ -377,10 +378,12 @@ start
 		return (current.cutsceneSequence != old.cutsceneSequence && current.cutsceneSequence == "Dialogue_POD_ToXion1st");
 	}
 
+	// print("event_id: " + current.event_id.ToString());
+
 	// 47 to 48 -- press continue
 	// 53 to 54 -- new game or new game plus
 	// 49 to 50 -- ng or ng+ on some systems, unsure what the difference is
-	//return ((current.event_id == 54 || current.event_id == 50 || current.event_id == 53 || current.event_id== 47) && (old.event_id + 1) == current.event_id);
+	// return ((current.event_id == 54 || current.event_id == 55 || current.event_id == 50 || current.event_id == 53 || current.event_id== 47) && (old.event_id + 1) == current.event_id);
 
 	return (current.cutsceneSequence != old.cutsceneSequence && current.cutsceneSequence == "MV_Prologue_Main");
 }
