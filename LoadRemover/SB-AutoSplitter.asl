@@ -291,8 +291,8 @@ onStart
     #endregion
 
 	//reset tracked IGT
-	timer.SetGameTime(TimeSpan.FromSeconds(0.97));
-	vars.trackedTime = TimeSpan.Zero;
+	vars.trackedTime = TimeSpan.FromSeconds(0.97);
+	timer.SetGameTime(vars.trackedTime);
 }
 
 isLoading
