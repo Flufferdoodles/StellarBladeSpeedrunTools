@@ -166,9 +166,10 @@ startup
 		new object[] { "Flooded Commercial Sector Discovery", "MV_DED02_ShoppingMallEnter_Master", "Eidos 7" },
 		new object[] { "Entered Hall of Records", "MV_DED02_WarpToArchive", "Eidos 7" },
 		new object[] { "Corruptor Entrance", "MV_DED02_Elite_GrubShooter_Master", "Eidos 7" },
-		new object[] { "Corruptor Finisher", "MV_DED02_Elite_GrubShooterFinish_Maste", "Eidos 7" },
+		new object[] { "Corruptor Finisher", "MV_DED02_Elite_GrubShooterFinish_Master", "Eidos 7" },
 		new object[] { "Construction Zone Discovery", "MV_DED02_EnterConstructionSite_Transit", "Eidos 7" },
-		new object[] { "All Crane Keycards", "Subtitle_DED02_GetCraneAccess3", "Eidos 7" },
+		//new object[] { "All Crane Keycards", "Subtitle_DED02_GetCraneAccess3", "Eidos 7" }, //only triggers when interacting w/ crane before having all keycards
+		new object[] { "Construction Zone Rooftop Cutscene", "MV_DED02_Rooftop_Master", "Eidos 7" },
 		new object[] { "Second Sewer Camp", "Subtitle_DED03_Find2ndCamp", "Eidos 7" },
 
 		// Gigas
