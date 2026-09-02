@@ -11,7 +11,7 @@ state("SB-Win64-Shipping", "current")
 	//int cutsceneDurationFrames : 0x07032700, 0x20, 0x0, 0x60, 0x474;
 	float overrideSubtitleCoolTime : 0x07032700, 0x20, 0x0, 0x60, 0x648, 0x31C;
 	string256 cutsceneSequence : 0x07032700, 0x20, 0x0, 0x60, 0x730, 0x0;
-	// int event_id : 0x70C6BDC; // used for debug, accurate but unused address
+	int event_id : 0x70C6BDC; // used for debug, accurate but unused address
 }
 
 state("SB-Win64-Shipping", "1.4.1")
@@ -291,10 +291,6 @@ onStart
         }
     }
     #endregion
-
-	//reset tracked IGT
-	vars.trackedTime = TimeSpan.FromSeconds(3.77); // difference between event_id and new strat for starting splitter
-	timer.SetGameTime(vars.trackedTime);
 }
 
 isLoading
@@ -340,6 +336,15 @@ gameTime
 
 split
 {
+	// print("cutsceneSequence: " + current.cutsceneSequence);
+	// return (current.cutsceneSequence != old.cutsceneSequence && current.cutsceneSequence == "MV_Prologue_Main");
+
+	// if (current.cutsceneSequence == "MV_Prologue_Main") {
+	// 	print("Sir we're trying our best we really are");
+	// 	return true;
+	// }
+
+
 	if (settings["debug_spew"]) {
 		return (current.cutsceneSequence != old.cutsceneSequence && old.cutsceneSequence == "Dialogue_POD_ToXion1st");
 	}
@@ -370,7 +375,12 @@ split
 
 reset
 {
-	return (current.cutsceneSequence != old.cutsceneSequence && current.cutsceneSequence == "MV_Prologue_Main");
+	if (current.cutsceneSequence != old.cutsceneSequence && current.cutsceneSequence == "MV_Prologue_Main") {
+		//reset tracked IGT
+		vars.trackedTime = TimeSpan.FromSeconds(3.77); // difference between event_id and new strat for starting splitter
+		timer.SetGameTime(vars.trackedTime);
+		return true;
+	}
 }
 
 start
@@ -384,9 +394,16 @@ start
 	// 47 to 48 -- press continue
 	// 53 to 54 -- new game or new game plus
 	// 49 to 50 -- ng or ng+ on some systems, unsure what the difference is
-	// return ((current.event_id == 54 || current.event_id == 55 || current.event_id == 50 || current.event_id == 53 || current.event_id== 47) && (old.event_id + 1) == current.event_id);
+	// I wish to scream. These numbers are different between computers and.... something else
+	// return ((current.event_id == 54 || current.event_id == 55 || current.event_id == 56 || current.event_id == 50 || current.event_id == 53 || current.event_id== 47) && (old.event_id + 1) == current.event_id);
 
-	return (current.cutsceneSequence != old.cutsceneSequence && current.cutsceneSequence == "MV_Prologue_Main");
+	// Believed this was exactly 3.77 seconds after "perfect" start, but it was in fact different across hardware
+	if (current.cutsceneSequence != old.cutsceneSequence && current.cutsceneSequence == "MV_Prologue_Main") {
+		//reset tracked IGT
+		vars.trackedTime = TimeSpan.FromSeconds(3.77); // difference between event_id and new strat for starting splitter
+		timer.SetGameTime(vars.trackedTime);
+		return true;
+	}
 }
 
 update
