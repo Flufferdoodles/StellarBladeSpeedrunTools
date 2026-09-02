@@ -373,15 +373,15 @@ split
 	}
 }
 
-reset
-{
-	if (current.cutsceneSequence != old.cutsceneSequence && current.cutsceneSequence == "MV_Prologue_Main") {
-		//reset tracked IGT
-		vars.trackedTime = TimeSpan.FromSeconds(3.77); // difference between event_id and new strat for starting splitter
-		timer.SetGameTime(vars.trackedTime);
-		return true;
-	}
-}
+// reset
+// {
+// 	if (current.cutsceneSequence != old.cutsceneSequence && current.cutsceneSequence == "MV_Prologue_Main") {
+// 		//reset tracked IGT
+// 		vars.trackedTime = TimeSpan.FromSeconds(3.77); // difference between event_id and new strat for starting splitter
+// 		timer.SetGameTime(vars.trackedTime);
+// 		return true;
+// 	}
+// }
 
 start
 {
@@ -395,15 +395,15 @@ start
 	// 53 to 54 -- new game or new game plus
 	// 49 to 50 -- ng or ng+ on some systems, unsure what the difference is
 	// I wish to scream. These numbers are different between computers and.... something else
-	// return ((current.event_id == 54 || current.event_id == 55 || current.event_id == 56 || current.event_id == 50 || current.event_id == 53 || current.event_id== 47) && (old.event_id + 1) == current.event_id);
+	return ((current.event_id == 54 || current.event_id == 55 || current.event_id == 56 || current.event_id == 50 || current.event_id == 53 || current.event_id== 47) && (old.event_id + 1) == current.event_id);
 
 	// Believed this was exactly 3.77 seconds after "perfect" start, but it was in fact different across hardware
-	if (current.cutsceneSequence != old.cutsceneSequence && current.cutsceneSequence == "MV_Prologue_Main") {
-		//reset tracked IGT
-		vars.trackedTime = TimeSpan.FromSeconds(3.77); // difference between event_id and new strat for starting splitter
-		timer.SetGameTime(vars.trackedTime);
-		return true;
-	}
+	// if (current.cutsceneSequence != old.cutsceneSequence && current.cutsceneSequence == "MV_Prologue_Main") {
+	// 	//reset tracked IGT
+	// 	vars.trackedTime = TimeSpan.FromSeconds(3.77); // difference between event_id and new strat for starting splitter
+	// 	timer.SetGameTime(vars.trackedTime);
+	// 	return true;
+	// }
 }
 
 update
