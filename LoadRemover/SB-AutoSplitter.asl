@@ -64,6 +64,21 @@ state("SB-Win64-Shipping", "1.2.0")
     int event_id : 0x710B4E4;
 }
 
+state("SB-Win64-Shipping", "1.1.2")
+{
+	// patch 1.1.2
+	bool isLoading : 0x6D9FDF8; // ??? from metera's splitter, it pauses during fadeouts to main menu
+	float timeScale : 0x70548C8, 0x30, 0x268, 0x201C;
+	float TimeSeconds : 0x70548C8, 0x748;
+	float UnpausedTimeSeconds : 0x70548C8, 0x74C;
+	int cutsceneFrameNum : 0x0708CFF8, 0x20, 0x0, 0x100;
+	//void *AnimationPlayer : 0x0708CFF8, 0x20, 0x0, 0x60;
+	//int cutsceneStartFrame : 0x0708CFF8, 0x20, 0x0, 0x60, 0x470;
+	//int cutsceneDurationFrames : 0x0708CFF8, 0x20, 0x0, 0x60, 0x474;
+	float overrideSubtitleCoolTime : 0x0708CFF8, 0x20, 0x0, 0x60, 0x648, 0x31C;
+	string256 cutsceneSequence : 0x0708CFF8, 0x20, 0x0, 0x60, 0x730, 0x0;
+}
+
 state("SB-Win64-Shipping", "1.1.0")
 {
     bool isLoading : 0x70FD960;
@@ -104,6 +119,11 @@ init
 			version = "1.2.0";
 			vars.timeScalePtr = null;
 			vars.subtitleCoolTimePtr = null;
+			break;
+		case 346890240: // 346890240 - ver 1.1.2
+			version = "1.1.2";
+			vars.timeScalePtr = new DeepPointer(0x70548C8, 0x30, 0x268, 0x201C);
+			vars.subtitleCoolTimePtr = new DeepPointer(0x0708CFF8, 0x20, 0x0, 0x60, 0x648, 0x31C);
 			break;
 		case 356278272: // 356278272 - ver 1.1.0
 			version = "1.1.0";
@@ -348,7 +368,7 @@ split
 
 
 	if (settings["debug_spew"]) {
-		return (current.cutsceneSequence != old.cutsceneSequence && old.cutsceneSequence == "Dialogue_POD_ToXion1st");
+		//return (current.cutsceneSequence != old.cutsceneSequence && old.cutsceneSequence == "Dialogue_POD_ToXion1st");
 	}
 
 	if (current.cutsceneSequence != old.cutsceneSequence) {
