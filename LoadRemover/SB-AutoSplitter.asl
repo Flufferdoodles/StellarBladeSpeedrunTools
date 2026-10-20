@@ -81,12 +81,14 @@ state("SB-Win64-Shipping", "1.1.0")
 init
 {
 	//assign version string
-	switch (modules.First().ModuleMemorySize)
+	int moduleMemorySize = modules.First().ModuleMemorySize;
+	switch (moduleMemorySize)
 	{
 		default:
 			version = "unknown";
 			vars.timeScalePtr = null;
 			vars.subtitleCoolTimePtr = null;
+			print("[SBSplitter] Unknown version - ModuleMemorySize: " + moduleMemorySize.ToString());
 			break;
 		case 362287104: // 362287104 - ver 1.4.1a
 			version = "1.4.1a";
