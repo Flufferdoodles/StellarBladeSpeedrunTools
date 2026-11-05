@@ -1,5 +1,21 @@
 state("SB-Win64-Shipping", "current")
 {
+    // patch 1.5.0
+    bool isLoading : 0x70C3FE8;
+	float timeScale : 0x6FFB918, 0x30, 0x268, 0x201C; //@TODO
+	float TimeSeconds : 0x6FFB918, 0x748; //@TODO
+	float UnpausedTimeSeconds : 0x6FFB918, 0x74C; //@TODO
+	int cutsceneFrameNum : 0x07032700, 0x20, 0x0, 0x100; //@TODO
+	//void *AnimationPlayer : 0x07032700, 0x20, 0x0, 0x60;
+	//int cutsceneStartFrame : 0x07032700, 0x20, 0x0, 0x60, 0x470;
+	//int cutsceneDurationFrames : 0x07032700, 0x20, 0x0, 0x60, 0x474;
+	float overrideSubtitleCoolTime : 0x07032700, 0x20, 0x0, 0x60, 0x648, 0x31C; //@TODO
+	string256 cutsceneSequence : 0x07032700, 0x20, 0x0, 0x60, 0x730, 0x0; //@TODO
+	int event_id : 0x70C6BDC; // used for debug, accurate but unused address //@TODO
+}
+
+state("SB-Win64-Shipping", "1.4.1a")
+{
     // patch 1.4.1a
     bool isLoading : 0x70BF018;
 	float timeScale : 0x6FFB918, 0x30, 0x268, 0x201C;
