@@ -2,16 +2,16 @@ state("SB-Win64-Shipping", "current")
 {
     // patch 1.5.0
     bool isLoading : 0x70C3FE8;
-	float timeScale : 0x6FFB918, 0x30, 0x268, 0x201C; //@TODO
-	float TimeSeconds : 0x6FFB918, 0x748; //@TODO
-	float UnpausedTimeSeconds : 0x6FFB918, 0x74C; //@TODO
-	int cutsceneFrameNum : 0x07032700, 0x20, 0x0, 0x100; //@TODO
-	//void *AnimationPlayer : 0x07032700, 0x20, 0x0, 0x60;
-	//int cutsceneStartFrame : 0x07032700, 0x20, 0x0, 0x60, 0x470;
-	//int cutsceneDurationFrames : 0x07032700, 0x20, 0x0, 0x60, 0x474;
-	float overrideSubtitleCoolTime : 0x07032700, 0x20, 0x0, 0x60, 0x648, 0x31C; //@TODO
-	string256 cutsceneSequence : 0x07032700, 0x20, 0x0, 0x60, 0x730, 0x0; //@TODO
-	int event_id : 0x70C6BDC; // used for debug, accurate but unused address //@TODO
+	float timeScale : 0x6FFEF08, 0x30, 0x268, 0x201C;
+	float TimeSeconds : 0x6FFEF08, 0x748;
+	float UnpausedTimeSeconds : 0x6FFEF08, 0x74C;
+	int cutsceneFrameNum : 0x070375A0, 0x20, 0x0, 0x100; //@TODO
+	//void *AnimationPlayer : 0x070375A0, 0x20, 0x0, 0x60;
+	//int cutsceneStartFrame : 0x070375A0, 0x20, 0x0, 0x60, 0x470;
+	//int cutsceneDurationFrames : 0x070375A0, 0x20, 0x0, 0x60, 0x474;
+	float overrideSubtitleCoolTime : 0x070375A0, 0x20, 0x0, 0x60, 0x648, 0x31C;
+	string256 cutsceneSequence : 0x070375A0, 0x20, 0x0, 0x60, 0x730, 0x0;
+	int event_id : 0x70C6BDC; // used for debug, accurate but unused address
 }
 
 state("SB-Win64-Shipping", "1.4.1a")
@@ -120,6 +120,11 @@ init
 			vars.timeScalePtr = null;
 			vars.subtitleCoolTimePtr = null;
 			print("[SBSplitter] Unknown version - ModuleMemorySize: " + moduleMemorySize.ToString());
+			break;
+		case 368717824: // 368717824 - ver 1.5.0
+			version = "1.5.0";
+			vars.timeScalePtr = new DeepPointer(0x6FFEF08, 0x30, 0x268, 0x201C);
+			vars.subtitleCoolTimePtr = new DeepPointer(0x070375A0, 0x20, 0x0, 0x60, 0x648, 0x31C);
 			break;
 		case 362287104: // 362287104 - ver 1.4.1a
 			version = "1.4.1a";
